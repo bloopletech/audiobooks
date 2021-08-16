@@ -38,6 +38,11 @@ public class PlayAudiobookActivity extends Activity {
             .setConstantBitrateSeekingEnabled(true)
             .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING);
 
+        File myFile = new File(book.path());
+        String bookUrl = String.valueOf(Uri.fromFile(myFile));
+
+        MediaItem mediaItem = MediaItem.fromUri(bookUrl);
+
         player = new SimpleExoPlayer.Builder(this)
             .setMediaSourceFactory(
                 new DefaultMediaSourceFactory(this, extractorsFactory))
@@ -46,10 +51,6 @@ public class PlayAudiobookActivity extends Activity {
         StyledPlayerControlView playerView = findViewById(R.id.player);
         playerView.setPlayer(player);
 
-        File myFile = new File(book.path());
-        String bookUrl = String.valueOf(Uri.fromFile(myFile));
-
-        MediaItem mediaItem = MediaItem.fromUri(bookUrl);
         player.setMediaItem(mediaItem);
         player.seekTo(book.lastReadPosition());
         player.setPlayWhenReady(true);
