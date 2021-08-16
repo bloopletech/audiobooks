@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="18sp"
+    android:paddingTop="11dp"
+    android:paddingBottom="11dp"
+    android:paddingLeft="22sp"
+    android:paddingRight="22sp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+        <TextView
+            android:id="@+id/story_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:textAlignment="viewStart"
+            android:paddingBottom="3dp"
+            android:paddingRight="8dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/story_size"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.15"
+                android:maxLines="1"
+                android:paddingRight="8dp"
+                android:textAlignment="viewStart"
+                android:textColor="#8A000000"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/story_last_opened"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#8A000000"
+                android:textAlignment="viewStart"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:layout_weight="0.3"
+                android:layout_gravity="center"
+                android:maxLines="1"
+                android:drawableStart="@drawable/ic_visibility_black_18dp_tint"
+                android:drawablePadding="4dp" />
+
+            <TextView
+                android:id="@+id/story_age"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#8A000000"
+                android:textAlignment="viewStart"
+                android:paddingLeft="8dp"
+                android:layout_weight="0.3"
+                android:layout_gravity="center"
+                android:maxLines="1"
+                android:drawableStart="@drawable/ic_history_black_18dp_tint"
+                android:drawablePadding="4dp" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/story_star"
+        android:layout_width="48dp"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        android:src="@drawable/book_starred_selector" />
+</LinearLayout>
