@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Audiobooks</string>
+    <string name="notification_title">Radio Streaming</string>
 </resources>

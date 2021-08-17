@@ -9,9 +9,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.widget.TextView
-import com.beraldo.playerlib.PlayerService
-import com.beraldo.playerlib.PlayerService.Companion.STREAM_POSITION
-import com.beraldo.playerlib.PlayerService.Companion.STREAM_URL
+import net.bloople.audiobooks.PlayerService.Companion.STREAM_POSITION
+import net.bloople.audiobooks.PlayerService.Companion.STREAM_URL
 import java.io.File
 
 class PlayAudiobookActivity : Activity() {

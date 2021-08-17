@@ -3,6 +3,7 @@
     package="net.bloople.audiobooks">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -24,7 +25,7 @@
 
         </activity>
 
-        <service android:name="com.beraldo.playerlib.PlayerService" android:exported="false" />
+        <service android:name=".PlayerService" android:exported="false" />
 
         <receiver
             android:name=".LaunchPlayerBroadcastReceiver"
