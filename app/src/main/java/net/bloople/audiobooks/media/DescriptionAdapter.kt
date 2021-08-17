@@ -19,18 +19,17 @@ package net.bloople.audiobooks.media
 
 import android.app.PendingIntent
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
-import net.bloople.audiobooks.R
+import net.bloople.audiobooks.PlayerService
 
 /**
  * Created by Filippo Beraldo on 15/11/2018.
  * http://github.com/beraldofilippo
  */
-class DescriptionAdapter(private val context: Context, private val bookId: Long) :
+class DescriptionAdapter(private val context: PlayerService) :
     PlayerNotificationManager.MediaDescriptionAdapter {
 
     override fun getCurrentContentTitle(player: Player): String =
@@ -71,8 +70,8 @@ class DescriptionAdapter(private val context: Context, private val bookId: Long)
 
             explicit.component = componentName
         }
-        explicit.putExtra("_id", bookId)
+        explicit.putExtra("_id", context.bookId)
 
-        return PendingIntent.getBroadcast(context, 1, explicit, 0)
+        return PendingIntent.getBroadcast(context, 1, explicit, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 }

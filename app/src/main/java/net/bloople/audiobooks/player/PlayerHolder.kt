@@ -30,23 +30,13 @@ import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
  * Creates and manages a [com.google.android.exoplayer2.ExoPlayer] instance.
  */
 class PlayerHolder(
-    context: Context,
-    private val mediaUrl: String,
-    private val mediaTitle: String,
-    private val playerState: PlayerState
+    context: Context
 ) {
     val audioFocusPlayer: ExoPlayer
-    private val mediaItem: MediaItem
+    private var playerState: PlayerState? = null
 
     // Create the player instance.
     init {
-        val originalMediaItem = MediaItem.fromUri(mediaUrl)
-        mediaItem = originalMediaItem.buildUpon().apply {
-            setMediaMetadata(originalMediaItem.mediaMetadata.buildUpon().apply {
-                setTitle(mediaTitle)
-            }.build())
-        }.build()
-
         val extractorsFactory: DefaultExtractorsFactory = DefaultExtractorsFactory()
             .setConstantBitrateSeekingEnabled(true)
             .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING)
@@ -66,15 +56,22 @@ class PlayerHolder(
             audioManager,
             player
         ).apply {
-            setMediaItem(mediaItem)
             prepare()
         }
     }
 
     // Prepare playback.
-    fun start() {
+    fun start(mediaUrl: String, mediaTitle: String, playerState: PlayerState) {
+        this.playerState = playerState
         with(audioFocusPlayer) {
             // Restore state (after onResume()/onStart())
+            val originalMediaItem = MediaItem.fromUri(mediaUrl)
+            val mediaItem = originalMediaItem.buildUpon().apply {
+                setMediaMetadata(originalMediaItem.mediaMetadata.buildUpon().apply {
+                    setTitle(mediaTitle)
+                }.build())
+            }.build()
+
             setMediaItem(mediaItem)
             prepare()
             with(playerState) {
@@ -90,7 +87,7 @@ class PlayerHolder(
     fun stop() {
         with(audioFocusPlayer) {
             // Save state
-            with(playerState) {
+            playerState?.run {
                 position = currentPosition
                 window = currentWindowIndex
                 whenReady = playWhenReady
@@ -104,5 +101,6 @@ class PlayerHolder(
     // Destroy the player instance.
     fun release() {
         audioFocusPlayer.release() // player instance can't be used again.
+        playerState = null
     }
 }

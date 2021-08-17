@@ -17,8 +17,10 @@ class PlayAudiobookActivity : Activity() {
     /**
      * Create our connection to the service to be used in our bindService call.
      */
+    private var serviceBound = false
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
+            serviceBound = false
             playerView?.let { playerView!!.player = null }
         }
 
@@ -26,6 +28,7 @@ class PlayAudiobookActivity : Activity() {
          * Called after a successful bind with our PlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            serviceBound = true
             if (service is PlayerService.PlayerServiceBinder) {
                 val holder = service.getPlayerHolderInstance() // use the player and call methods on it to start and stop
                 playerView?.let { playerView!!.player = holder.audioFocusPlayer }
@@ -49,9 +52,10 @@ class PlayAudiobookActivity : Activity() {
 
         playerView = findViewById(R.id.player)
 
-        val playerIntent = Intent(this, PlayerService::class.java).apply {
+        val playerIntent = Intent(this.applicationContext, PlayerService::class.java).apply {
             putExtra("_id", book.id())
         }
+        startService(playerIntent)
         bindService(playerIntent, connection, Context.BIND_AUTO_CREATE)
     }
 
@@ -65,5 +69,13 @@ class PlayAudiobookActivity : Activity() {
     override fun onBackPressed() {
         super.onBackPressed()
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(serviceBound) {
+            serviceBound = false
+            unbindService(connection)
+        }
     }
 }
