@@ -30,11 +30,11 @@ import net.bloople.audiobooks.R
  * Created by Filippo Beraldo on 15/11/2018.
  * http://github.com/beraldofilippo
  */
-class DescriptionAdapter(private val context: Context) :
+class DescriptionAdapter(private val context: Context, private val bookId: Long) :
     PlayerNotificationManager.MediaDescriptionAdapter {
 
     override fun getCurrentContentTitle(player: Player): String =
-        context.getString(R.string.notification_title)
+        player.mediaMetadata.title.toString()
 
     override fun getCurrentContentText(player: Player): String? = null
 
@@ -58,7 +58,7 @@ class DescriptionAdapter(private val context: Context) :
      * */
     override fun createCurrentContentIntent(player: Player): PendingIntent? {
         val intent = Intent().apply {
-            action = "com.beraldo.playerlib.LAUNCH_PLAYER_ACTIVITY"
+            action = "net.bloople.audiobooks.LAUNCH_PLAYER_ACTIVITY"
         }
         val matches = context.packageManager.queryBroadcastReceivers(intent, 0)
 
@@ -71,7 +71,8 @@ class DescriptionAdapter(private val context: Context) :
 
             explicit.component = componentName
         }
+        explicit.putExtra("_id", bookId)
 
-        return PendingIntent.getBroadcast(context, 0, explicit, 0)
+        return PendingIntent.getBroadcast(context, 1, explicit, 0)
     }
 }

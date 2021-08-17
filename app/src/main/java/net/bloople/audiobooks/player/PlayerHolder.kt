@@ -22,20 +22,40 @@ import android.content.Context
 import android.media.AudioManager
 import androidx.media.AudioAttributesCompat
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
+import com.google.android.exoplayer2.extractor.mp3.Mp3Extractor
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 
 /**
  * Creates and manages a [com.google.android.exoplayer2.ExoPlayer] instance.
  */
 class PlayerHolder(
     context: Context,
-    private val streamUrl: String,
-    private val streamPosition: Long,
+    private val mediaUrl: String,
+    private val mediaTitle: String,
     private val playerState: PlayerState
 ) {
     val audioFocusPlayer: ExoPlayer
+    private val mediaItem: MediaItem
 
     // Create the player instance.
     init {
+        val originalMediaItem = MediaItem.fromUri(mediaUrl)
+        mediaItem = originalMediaItem.buildUpon().apply {
+            setMediaMetadata(originalMediaItem.mediaMetadata.buildUpon().apply {
+                setTitle(mediaTitle)
+            }.build())
+        }.build()
+
+        val extractorsFactory: DefaultExtractorsFactory = DefaultExtractorsFactory()
+            .setConstantBitrateSeekingEnabled(true)
+            .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING)
+
+        val player = SimpleExoPlayer.Builder(context).apply {
+            setMediaSourceFactory(DefaultMediaSourceFactory(context, extractorsFactory))
+            //player.setWakeMode(C.WAKE_MODE_LOCAL)
+        }.build()
+
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val audioAttributes = AudioAttributesCompat.Builder()
             .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
@@ -44,32 +64,25 @@ class PlayerHolder(
         audioFocusPlayer = AudioFocusWrapper(
             audioAttributes,
             audioManager,
-            SimpleExoPlayer.Builder(context).apply {
-
-            }.build()
+            player
         ).apply {
-            setMediaItem(MediaItem.fromUri(streamUrl))
-            seekTo(streamPosition)
+            setMediaItem(mediaItem)
             prepare()
         }
-        println("SimpleExoPlayer created")
     }
 
     // Prepare playback.
     fun start() {
         with(audioFocusPlayer) {
             // Restore state (after onResume()/onStart())
-            setMediaItem(MediaItem.fromUri(streamUrl))
+            setMediaItem(mediaItem)
             prepare()
             with(playerState) {
                 // Start playback when media has buffered enough
                 // (whenReady is true by default).
                 playWhenReady = whenReady
                 seekTo(window, position)
-                // Add logging.
-                attachLogging(audioFocusPlayer)
             }
-            println("SimpleExoPlayer is started")
         }
     }
 
@@ -86,39 +99,10 @@ class PlayerHolder(
             stop()
             clearMediaItems()
         }
-        println("SimpleExoPlayer is stopped")
     }
 
     // Destroy the player instance.
     fun release() {
         audioFocusPlayer.release() // player instance can't be used again.
-        println("SimpleExoPlayer is released")
-    }
-
-    /**
-     * For more info on ExoPlayer logging, please review this
-     * [codelab](https://codelabs.developers.google.com/codelabs/exoplayer-intro/#5).
-     */
-    private fun attachLogging(exoPlayer: ExoPlayer) {
-        // Write to log on state changes.
-        exoPlayer.addListener(object : Player.Listener {
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                println("playerStateChanged: ${getStateString(playbackState)}, $playWhenReady")
-            }
-
-            override fun onPlayerError(error: PlaybackException) {
-                println("playerError: $error")
-            }
-
-            fun getStateString(state: Int): String {
-                return when (state) {
-                    Player.STATE_BUFFERING -> "STATE_BUFFERING"
-                    Player.STATE_ENDED -> "STATE_ENDED"
-                    Player.STATE_IDLE -> "STATE_IDLE"
-                    Player.STATE_READY -> "STATE_READY"
-                    else -> "?"
-                }
-            }
-        })
     }
 }

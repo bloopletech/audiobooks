@@ -31,7 +31,7 @@
             android:name=".LaunchPlayerBroadcastReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.beraldo.playerlib.LAUNCH_PLAYER_ACTIVITY" />
+                <action android:name="net.bloople.audiobooks.LAUNCH_PLAYER_ACTIVITY" />
             </intent-filter>
         </receiver>
     </application>

@@ -5,29 +5,30 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.widget.TextView
-import net.bloople.audiobooks.PlayerService.Companion.STREAM_POSITION
-import net.bloople.audiobooks.PlayerService.Companion.STREAM_URL
-import java.io.File
+import com.google.android.exoplayer2.ui.StyledPlayerControlView
 
 class PlayAudiobookActivity : Activity() {
-    private var book: Book? = null
+    private var bookId: Long = -1
+    private var playerView: StyledPlayerControlView? = null
 
     /**
      * Create our connection to the service to be used in our bindService call.
      */
     private val connection = object : ServiceConnection {
-        override fun onServiceDisconnected(name: ComponentName?) {}
+        override fun onServiceDisconnected(name: ComponentName?) {
+            playerView?.let { playerView!!.player = null }
+        }
 
         /**
          * Called after a successful bind with our PlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is PlayerService.PlayerServiceBinder) {
-                service.getPlayerHolderInstance() // use the player and call methods on it to start and stop
+                val holder = service.getPlayerHolderInstance() // use the player and call methods on it to start and stop
+                playerView?.let { playerView!!.player = holder.audioFocusPlayer }
             }
         }
     }
@@ -37,60 +38,32 @@ class PlayAudiobookActivity : Activity() {
         setContentView(R.layout.activity_play_audiobook)
 
         val intent: Intent = getIntent()
-        book = Book.findById(this, intent.getLongExtra("_id", -1))
-        book!!.lastOpenedAt(System.currentTimeMillis())
-        book!!.save(this)
+        bookId = intent.getLongExtra("_id", -1)
 
-        val bookPathView: TextView = findViewById<TextView>(R.id.book_path)
-        bookPathView.setText(book!!.path())
+        val book = Book.findById(this, bookId)
+        book.lastOpenedAt(System.currentTimeMillis())
+        book.save(this)
 
-//        val extractorsFactory: DefaultExtractorsFactory = DefaultExtractorsFactory()
-//            .setConstantBitrateSeekingEnabled(true)
-//            .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING)
-        val myFile = File(book!!.path())
-        val bookUrl = Uri.fromFile(myFile).toString()
-//        val mediaItem: MediaItem = MediaItem.fromUri(bookUrl)
-//        player = Builder(this)
-//            .setMediaSourceFactory(
-//                DefaultMediaSourceFactory(this, extractorsFactory)
-//            )
-//            .build()
-//        player.setWakeMode(C.WAKE_MODE_LOCAL)
-//        val playerView: StyledPlayerControlView = findViewById(R.id.player)
-//        playerView.setPlayer(player)
-//        player.setMediaItem(mediaItem)
-//        player.seekTo(book.lastReadPosition())
-//        player.setPlayWhenReady(true)
-//        player.prepare()
-        //Start the service
+        val titleView: TextView = findViewById(R.id.exo_title)
+        titleView.setText(book.title())
+
+        playerView = findViewById(R.id.player)
+
         val playerIntent = Intent(this, PlayerService::class.java).apply {
-            putExtra(STREAM_URL, bookUrl)
-            putExtra(STREAM_POSITION, book!!.lastReadPosition())
+            putExtra("_id", book.id())
         }
         bindService(playerIntent, connection, Context.BIND_AUTO_CREATE)
     }
-//
-//    protected override fun onStop() {
-//        super.onStop()
-//        book!!.lastOpenedAt(System.currentTimeMillis())
-//        book!!.save(this)
-//        savePosition()
-//    }
-//
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        finish()
-//    }
-//
-//    protected override fun onDestroy() {
-//        super.onDestroy()
-//        player.release()
-//    }
-//
-//    fun savePosition() {
-//        var currentReadPosition: Long = player.getCurrentPosition()
-//        if (player.getPlaybackState() === Player.STATE_ENDED) currentReadPosition = 0
-//        book!!.lastReadPosition(currentReadPosition)
-//        book!!.save(this)
-//    }
+
+    override fun onStop() {
+        super.onStop()
+        val book = Book.findById(this, bookId)
+        book.lastOpenedAt(System.currentTimeMillis())
+        book.save(this)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
+    }
 }

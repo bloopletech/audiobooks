@@ -4,6 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+
+import java.io.File;
 
 class Book {
     private long _id = -1L;
@@ -61,12 +64,20 @@ class Book {
         starred = result.getInt(result.getColumnIndex("starred")) == 1;
     }
 
+    public long id() {
+        return _id;
+    }
+
     public String path() {
         return path;
     }
 
     public void path(String path) {
         this.path = path;
+    }
+
+    public String uri() {
+        return Uri.fromFile(new File(path)).toString();
     }
 
     public String title() {
