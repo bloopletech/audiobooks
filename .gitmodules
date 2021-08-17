@@ -1,0 +1,3 @@
+[submodule "playerlib"]
+	path = playerlib
+	url = git@github.com:bloopletech/playerlib.git

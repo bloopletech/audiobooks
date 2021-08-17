@@ -3,6 +3,7 @@
     package="net.bloople.audiobooks">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -22,6 +23,16 @@
         <activity android:name="net.bloople.audiobooks.IndexingActivity">
 
         </activity>
+
+        <service android:name="com.beraldo.playerlib.PlayerService" android:exported="false" />
+
+        <receiver
+            android:name=".LaunchPlayerBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.beraldo.playerlib.LAUNCH_PLAYER_ACTIVITY" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
