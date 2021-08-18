@@ -9,7 +9,7 @@ android {
         applicationId "net.bloople.audiobooks"
         minSdkVersion 23
         targetSdkVersion 28
-        final def version = 4
+        final def version = 5
         versionCode version
         versionName version.toString()
     }
