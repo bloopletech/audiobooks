@@ -86,7 +86,7 @@ public class BooksActivity extends Activity {
             }
         });
 
-        listView = (RecyclerView)findViewById(R.id.stories_list);
+        listView = (RecyclerView)findViewById(R.id.audiobooks_list);
         adapter = new BooksAdapter(null);
         listView.setAdapter(adapter);
 
