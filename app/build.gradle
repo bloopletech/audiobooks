@@ -12,7 +12,6 @@ android {
         final def version = 4
         versionCode version
         versionName version.toString()
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
@@ -33,10 +32,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.annotation:annotation:1.1.0'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test:rules:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation "androidx.core:core-ktx:1.6.0"
     implementation 'com.google.android.exoplayer:exoplayer-core:2.15.0'
