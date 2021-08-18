@@ -30,8 +30,8 @@ class PlayAudiobookActivity : Activity() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             serviceBound = true
             if (service is PlayerService.PlayerServiceBinder) {
-                val holder = service.getPlayerHolderInstance() // use the player and call methods on it to start and stop
-                playerView?.let { playerView!!.player = holder.audioFocusPlayer }
+                val audioFocusPlayer = service.getPlayerInstance() // use the player and call methods on it to start and stop
+                playerView?.let { playerView!!.player = audioFocusPlayer }
             }
         }
     }

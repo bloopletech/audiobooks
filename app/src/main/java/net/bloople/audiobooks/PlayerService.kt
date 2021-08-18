@@ -20,15 +20,20 @@ package net.bloople.audiobooks
 import android.app.IntentService
 import android.app.Notification
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Binder
 import android.os.IBinder
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.Player
+import androidx.media.AudioAttributesCompat
+import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
+import com.google.android.exoplayer2.extractor.mp3.Mp3Extractor
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import net.bloople.audiobooks.media.DescriptionAdapter
-import net.bloople.audiobooks.player.PlayerHolder
 import net.bloople.audiobooks.player.PlayerState
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import net.bloople.audiobooks.player.AudioFocusWrapper
 
 /**
  * Created by Filippo Beraldo on 15/11/2018.
@@ -42,21 +47,39 @@ class PlayerService : IntentService("audiobooks") {
 
     var bookId: Long = -1
 
-    private lateinit var playerHolder: PlayerHolder
+    private lateinit var player: ExoPlayer
+    private var playerState: PlayerState? = null
 
     private lateinit var playerNotificationManager: PlayerNotificationManager
 
     override fun onCreate() {
         super.onCreate()
 
-        // Build a player holder
-        playerHolder = PlayerHolder(this)
+        val extractorsFactory: DefaultExtractorsFactory = DefaultExtractorsFactory()
+            .setConstantBitrateSeekingEnabled(true)
+            .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING)
 
-        playerHolder.audioFocusPlayer.addListener(object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                if(!isPlaying) savePosition()
-            }
-        })
+        val exoPlayer = SimpleExoPlayer.Builder(this).apply {
+            setMediaSourceFactory(DefaultMediaSourceFactory(this@PlayerService, extractorsFactory))
+            //player.setWakeMode(C.WAKE_MODE_LOCAL)
+        }.build()
+
+        val audioManager = this.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val audioAttributes = AudioAttributesCompat.Builder()
+            .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
+            .setUsage(AudioAttributesCompat.USAGE_MEDIA)
+            .build()
+        player = AudioFocusWrapper(
+            audioAttributes,
+            audioManager,
+            exoPlayer
+        ).apply {
+            addListener(object : Player.Listener {
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    if(!isPlaying) savePosition()
+                }
+            })
+        }
 
         /** Build a notification manager for our player, set a notification listener to this,
          * and assign the player just created.
@@ -98,7 +121,7 @@ class PlayerService : IntentService("audiobooks") {
             setUseNextAction(false)
             //setUseStopAction(true)
         }.also {
-            it.setPlayer(playerHolder.audioFocusPlayer)
+            it.setPlayer(player)
         }
     }
 
@@ -110,7 +133,7 @@ class PlayerService : IntentService("audiobooks") {
         stop()
 
         this.bookId = intent?.getLongExtra("_id", -1) ?: -1
-        initialize()
+        start()
 
         return Service.START_STICKY
     }
@@ -119,28 +142,59 @@ class PlayerService : IntentService("audiobooks") {
         super.onDestroy()
         stop()
         playerNotificationManager.setPlayer(null)
-        playerHolder.release()
+        // Destroy the player instance.
+        player.release() // player instance can't be used again.
+        playerState = null
     }
 
-    private fun initialize() {
+    // Prepare playback.
+    fun start() {
         val book = Book.findById(this, bookId) ?: return
-        playerHolder.start(book.uri(), book.title(), PlayerState(position = book.lastReadPosition()))
+        playerState = PlayerState(position = book.lastReadPosition())
+        with(player) {
+            // Restore state (after onResume()/onStart())
+            val originalMediaItem = MediaItem.fromUri(book.uri())
+            val mediaItem = originalMediaItem.buildUpon().apply {
+                setMediaMetadata(originalMediaItem.mediaMetadata.buildUpon().apply {
+                    setTitle(book.title())
+                }.build())
+            }.build()
+
+            setMediaItem(mediaItem)
+            prepare()
+            playerState?.run {
+                // Start playback when media has buffered enough
+                // (whenReady is true by default).
+                playWhenReady = whenReady
+                seekTo(window, position)
+            }
+        }
     }
 
+    // Stop playback and release resources, but re-use the player instance.
     private fun stop() {
         savePosition()
-        playerHolder.stop()
+        with(player) {
+            // Save state
+            playerState?.run {
+                position = currentPosition
+                window = currentWindowIndex
+                whenReady = playWhenReady
+            }
+            // Stop the player (and release it's resources). The player instance can be reused.
+            stop()
+            clearMediaItems()
+        }
     }
 
     inner class PlayerServiceBinder : Binder() {
-        fun getPlayerHolderInstance() = playerHolder
+        fun getPlayerInstance() = player
     }
 
     override fun onHandleIntent(intent: Intent?) {}
 
     private fun savePosition() {
         if (bookId == -1L) return;
-        val player = playerHolder.audioFocusPlayer
         val position = player.currentPosition
         val lastReadPosition = if (position == C.TIME_UNSET || position >= player.duration) 0 else position
         val book = Book.findById(this@PlayerService, bookId)
