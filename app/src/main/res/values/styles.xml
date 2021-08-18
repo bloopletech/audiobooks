@@ -1,6 +1,5 @@
 <resources>
-
-    <style name="AppTheme" parent="@android:style/Theme.Material.Light">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Hide the status bar -->
         <item name="android:windowFullscreen">true</item>
         <!-- Skip showing the application title -->
@@ -8,14 +7,14 @@
         <!--We will be using the toolbar so no need to show ActionBar-->
         <item name="android:windowActionBar">false</item>
         <!-- colorPrimary is used for the default action bar background -->
-        <item name="android:colorPrimary">#3F51B5</item>
+        <item name="colorPrimary">#3F51B5</item>
         <!-- colorPrimaryDark is used for the status bar -->
-        <item name="android:colorPrimaryDark">#303F9F</item>
+        <item name="colorPrimaryVariant">#303F9F</item>
         <!-- colorAccent is used as the default value for colorControlActivated
          which is used to tint widgets -->
         <item name="android:colorAccent">#FF4081</item>
     </style>
 
-
-
+    <style name="AppTheme.ActionBar" parent="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
+    </style>
 </resources>

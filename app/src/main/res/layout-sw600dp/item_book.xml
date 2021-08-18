@@ -38,7 +38,9 @@
                 android:paddingRight="8dp"
                 android:textAlignment="viewStart"
                 android:textColor="#8A000000"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:drawableStart="@drawable/ic_baseline_duration_18"
+                android:drawablePadding="4dp"/>
 
             <TextView
                 android:id="@+id/story_last_opened"

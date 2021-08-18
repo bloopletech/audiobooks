@@ -9,13 +9,13 @@
     tools:context="net.bloople.audiobooks.BooksActivity"
     android:background="#ffffff"
     android:focusableInTouchMode="true">
-    <Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?android:attr/actionBarSize"
         android:background="?android:attr/colorPrimary"
-        android:theme="@android:style/ThemeOverlay.Material.Dark.ActionBar">
+        android:theme="@style/AppTheme.ActionBar">
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
             android:textColor="#FFFFFF"
             android:minEms="15"
             android:drawableEnd="@drawable/ic_clear_white_24dp" />
-    </Toolbar>
+    </androidx.appcompat.widget.Toolbar>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/audiobooks_list"
         android:layout_width="match_parent"

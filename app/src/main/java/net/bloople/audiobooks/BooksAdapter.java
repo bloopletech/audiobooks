@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.Locale;
 
 class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
@@ -85,7 +86,7 @@ class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
 
         holder.titleView.setText(book.title());
 
-        holder.sizeView.setText(getReadableFileSize(book.size()));
+        holder.sizeView.setText(getReadableTimeDuration(book.size()));
 
         if(holder.ageView != null) {
             String age = DATE_FORMAT.format(new Date(book.mtime()));
@@ -110,5 +111,21 @@ class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
         final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    }
+
+    //Based on https://stackoverflow.com/a/63327131/14819
+    static String getReadableTimeDuration(long timeMs) {
+        Formatter formatter = new Formatter();
+        long totalSeconds = timeMs / 1000;
+        long seconds = totalSeconds % 60;
+        long minutes = (totalSeconds / 60) % 60;
+        long hours = totalSeconds / 3600;
+
+        if (hours > 0) {
+            return formatter.format("%d:%d:%02d", hours, minutes, seconds).toString();
+        }
+        else {
+            return formatter.format("%d:%02d", minutes, seconds).toString();
+        }
     }
 }

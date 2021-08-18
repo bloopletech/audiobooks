@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -20,9 +22,9 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 
-public class BooksActivity extends Activity {
+public class BooksActivity extends AppCompatActivity {
     public static final int SORT_ALPHABETIC = 0;
     public static final int SORT_AGE = 1;
     public static final int SORT_SIZE = 2;
@@ -43,7 +45,7 @@ public class BooksActivity extends Activity {
         setContentView(R.layout.activity_books);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        setActionBar(toolbar);
+        setSupportActionBar(toolbar);
 
         final EditText searchField = (EditText)findViewById(R.id.searchText);
         searchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {

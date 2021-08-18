@@ -3,13 +3,12 @@ package net.bloople.audiobooks;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,7 +93,8 @@ class IndexingTask extends AsyncTask<String, Integer, Void> {
             Matcher matcher = AUDIOBOOK_EXTENSIONS.matcher(file.getName());
             book.title(matcher.replaceFirst(""));
             book.mtime(file.lastModified());
-            book.size(file.length());
+            book.size(getDuration(book.path()));
+
 
             book.save(context);
             progress++;
@@ -105,5 +105,19 @@ class IndexingTask extends AsyncTask<String, Integer, Void> {
         }
 
         publishProgress(progress, max);
+    }
+
+    private int getDuration(String path) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(path);
+        String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        try {
+            return Integer.parseInt(duration);
+        }
+        catch(NumberFormatException e) {
+            e.printStackTrace();
+            return 0;
+        }
+
     }
 }

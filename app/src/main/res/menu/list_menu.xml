@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/sort_alphabetic"
         android:title="Name"
-        android:showAsAction="always"/>
+        app:showAsAction="always" />
     <item
         android:id="@+id/sort_size"
         android:title="Size"
-        android:showAsAction="always"/>
+        app:showAsAction="always" />
     <item
         android:id="@+id/sort_age"
         android:title="Age"
         android:icon="@drawable/ic_history_white_24dp"
-        android:showAsAction="always"/>
+        app:showAsAction="always" />
     <item
         android:id="@+id/sort_last_opened"
         android:title="Last Opened"
         android:icon="@drawable/ic_visibility_white_24dp"
-        android:showAsAction="always"/>
+        app:showAsAction="always" />
     <item
         android:id="@+id/sort_starred"
         android:title="Starred"
         android:icon="@drawable/ic_star_white_24dp"
-        android:showAsAction="always"/>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/manage_indexing"
         android:icon="@drawable/ic_settings_white_24dp"
-        android:showAsAction="always"/>
+        app:showAsAction="always" />
 </menu>
