@@ -108,16 +108,15 @@ class IndexingTask extends AsyncTask<String, Integer, Void> {
     }
 
     private int getDuration(String path) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(path);
-        String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         try {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(path);
+            String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
             return Integer.parseInt(duration);
         }
-        catch(NumberFormatException e) {
+        catch(RuntimeException e) {
             e.printStackTrace();
             return 0;
         }
-
     }
 }
