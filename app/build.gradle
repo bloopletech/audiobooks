@@ -9,7 +9,7 @@ android {
         applicationId "net.bloople.audiobooks"
         minSdkVersion 23
         targetSdkVersion 28
-        final def version = 1
+        final def version = 2
         versionCode version
         versionName version.toString()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
