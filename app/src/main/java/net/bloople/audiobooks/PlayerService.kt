@@ -94,6 +94,7 @@ class PlayerService : IntentService("audiobooks") {
             NOTIFICATION_CHANNEL
         ).apply {
             setChannelNameResourceId(R.string.app_name)
+            setSmallIconResourceId(R.drawable.ic_notification)
             setMediaDescriptionAdapter(DescriptionAdapter(this@PlayerService))
             setNotificationListener(object : PlayerNotificationManager.NotificationListener {
                 /** NotificationListener callbacks, we get these calls when our [playerNotificationManager]
