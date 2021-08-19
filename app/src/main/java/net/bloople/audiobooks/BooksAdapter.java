@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
@@ -26,41 +25,35 @@ class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
         ViewHolder(View view) {
             super(view);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Context context = v.getContext();
+            view.setOnClickListener(v -> {
+                Context context = v.getContext();
 
-                    Intent intent = Book.idTo(new Intent(context, PlayAudiobookActivity.class), getItemId());
-                    context.startActivity(intent);
-                }
+                Intent intent = Book.idTo(new Intent(context, PlayAudiobookActivity.class), getItemId());
+                context.startActivity(intent);
             });
 
-            titleView = (TextView)view.findViewById(R.id.story_title);
-            sizeView = (TextView)view.findViewById(R.id.story_size);
-            ageView = (TextView)view.findViewById(R.id.story_age);
-            lastOpenedView = (TextView)view.findViewById(R.id.story_last_opened);
-            starView = (ImageButton)view.findViewById(R.id.story_star);
+            titleView = view.findViewById(R.id.story_title);
+            sizeView = view.findViewById(R.id.story_size);
+            ageView = view.findViewById(R.id.story_age);
+            lastOpenedView = view.findViewById(R.id.story_last_opened);
+            starView = view.findViewById(R.id.story_star);
 
-            starView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Context context = view.getContext();
-                    long id = getItemId();
+            starView.setOnClickListener(view1 -> {
+                Context context = view1.getContext();
+                long id = getItemId();
 
-                    Book book = Book.find(context, id);
-                    boolean starred = !book.getStarred();
+                Book book = Book.find(context, id);
+                boolean starred = !book.getStarred();
 
-                    book.setStarred(starred);
-                    book.save(context);
+                book.setStarred(starred);
+                book.save(context);
 
-                    view.setActivated(starred);
-                }
+                view1.setActivated(starred);
             });
         }
     }
 
-    private SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d MMMM yyyy",
+    private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d MMMM yyyy",
             Locale.getDefault());
 
     BooksAdapter(Cursor cursor) {
@@ -100,14 +93,6 @@ class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
         }
 
         holder.starView.setActivated(book.getStarred());
-    }
-
-    //Copied from https://github.com/nbsp-team/MaterialFilePicker
-    static String getReadableFileSize(long size) {
-        if (size <= 0) return "0";
-        final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
-        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
-        return new DecimalFormat("#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
     //Based on https://stackoverflow.com/a/63327131/14819

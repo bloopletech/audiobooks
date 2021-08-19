@@ -10,18 +10,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import androidx.annotation.NonNull;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class IndexingActivity extends Activity implements Indexable {
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
+    private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
@@ -47,45 +45,37 @@ public class IndexingActivity extends Activity implements Indexable {
             canAccessFiles = true;
         }
 
-        progressBar = (ProgressBar)findViewById(R.id.indexing_progress);
+        progressBar = findViewById(R.id.indexing_progress);
 
-        indexButton = (Button)findViewById(R.id.index_button);
-        indexButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                indexButton.setEnabled(false);
+        indexButton = findViewById(R.id.index_button);
+        indexButton.setOnClickListener(v -> {
+            indexButton.setEnabled(false);
 
-                if(canAccessFiles) {
-                    IndexingTask indexer = new IndexingTask(IndexingActivity.this,
-                            IndexingActivity.this);
-                    indexer.execute(indexRoot);
-                }
+            if(canAccessFiles) {
+                IndexingTask indexer = new IndexingTask(IndexingActivity.this,
+                        IndexingActivity.this);
+                indexer.execute(indexRoot);
             }
         });
 
-        Button deleteIndexButton = (Button)findViewById(R.id.delete_index_button);
-        deleteIndexButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatabaseHelper.deleteDatabase(IndexingActivity.this);
-                Toast.makeText(IndexingActivity.this, "Index deleted.", Toast.LENGTH_SHORT).show();
-            }
+        Button deleteIndexButton = findViewById(R.id.delete_index_button);
+        deleteIndexButton.setOnClickListener(v -> {
+            DatabaseHelper.deleteDatabase(IndexingActivity.this);
+            Toast.makeText(IndexingActivity.this, "Index deleted.", Toast.LENGTH_SHORT).show();
         });
 
         loadPreferences();
 
-        final EditText indexDirectoryText = (EditText)findViewById(R.id.index_directory);
+        final EditText indexDirectoryText = findViewById(R.id.index_directory);
         indexDirectoryText.setText(indexRoot);
 
-        indexDirectoryText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) ||
-                        (actionId == EditorInfo.IME_ACTION_DONE)) {
-                    indexRoot = indexDirectoryText.getText().toString();
-                    savePreferences();
-                }
-                return false;
+        indexDirectoryText.setOnEditorActionListener((v, actionId, event) -> {
+            if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) ||
+                    (actionId == EditorInfo.IME_ACTION_DONE)) {
+                indexRoot = indexDirectoryText.getText().toString();
+                savePreferences();
             }
+            return false;
         });
     }
 
