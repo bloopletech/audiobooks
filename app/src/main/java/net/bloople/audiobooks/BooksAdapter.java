@@ -51,7 +51,7 @@ class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
                     Context context = view.getContext();
                     long id = getItemId();
 
-                    Book book = Book.findByIdOrNull(context, id);
+                    Book book = Book.find(context, id);
                     boolean starred = !book.getStarred();
 
                     book.setStarred(starred);

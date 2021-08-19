@@ -7,7 +7,7 @@ import android.net.Uri
 import java.io.File
 
 internal class Book {
-    var _id = -1L
+    var _id: Long? = null
     var path: String? = null
     var title: String? = null
     var mtime: Long = 0
@@ -44,10 +44,11 @@ internal class Book {
             put("starred", if (starred) 1 else 0)
         }
         val db = DatabaseHelper.instance(context)
-        if (_id == -1L) {
-            _id = db.insert("books", null, values)
-        } else {
+        if (_id != null) {
             db.update("books", values, "_id=?", arrayOf(_id.toString()))
+        }
+        else {
+            _id = db.insert("books", null, values)
         }
     }
 
@@ -67,15 +68,12 @@ internal class Book {
         }
 
         inline fun <R> editOrNull(context: Context, id: Long, block: Book.() -> R?): R? {
-            val book = findByIdOrNull(context, id) ?: return null
+            val book = findOrNull(context, id) ?: return null
             return block(book).also { book.save(context) }
         }
 
+        @JvmStatic
         fun find(context: Context, id: Long): Book {
-            return findById(context, id)
-        }
-
-        fun findById(context: Context, id: Long): Book {
             val db = DatabaseHelper.instance(context)
             db.rawQuery("SELECT * FROM books WHERE _id=?", arrayOf(id.toString())).use {
                 it.moveToFirst()
@@ -84,15 +82,10 @@ internal class Book {
         }
 
         fun findOrNull(context: Context, id: Long): Book? {
-            return findByIdOrNull(context, id)
-        }
-
-        @JvmStatic
-        fun findByIdOrNull(context: Context, id: Long): Book? {
-            val db = DatabaseHelper.instance(context)
-            db.rawQuery("SELECT * FROM books WHERE _id=?", arrayOf(id.toString())).use {
-                it.moveToFirst()
-                return if (it.count > 0) Book(it) else null
+            return try {
+                find(context, id)
+            } catch(e: NoSuchElementException) {
+                null
             }
         }
 
