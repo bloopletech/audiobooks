@@ -2,6 +2,7 @@ package net.bloople.audiobooks
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import java.io.File
@@ -95,6 +96,12 @@ internal class Book {
             db.rawQuery("SELECT * FROM books WHERE path=?", arrayOf(path)).use {
                 it.moveToFirst()
                 return if (it.count > 0) Book(it) else null
+            }
+        }
+
+        fun idFrom(intent: Intent?): Long {
+            return intent!!.getLongExtra("_id", -1).also {
+                if(it == -1L) throw IllegalArgumentException("Intent missing extra _id of type long")
             }
         }
     }

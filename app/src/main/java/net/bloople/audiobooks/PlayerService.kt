@@ -133,7 +133,7 @@ class PlayerService : IntentService("audiobooks") {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         stop()
 
-        this.bookId = intent?.getLongExtra("_id", -1) ?: -1
+        this.bookId = Book.idFrom(intent)
         start()
 
         return Service.START_STICKY

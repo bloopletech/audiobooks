@@ -40,7 +40,7 @@ class PlayAudiobookActivity : Activity() {
         setContentView(R.layout.activity_play_audiobook)
 
         val intent: Intent = getIntent()
-        bookId = intent.getLongExtra("_id", -1)
+        bookId = Book.idFrom(intent)
 
         val book = Book.find(this, bookId)
         book.edit(this) { lastOpenedAt = System.currentTimeMillis() }
