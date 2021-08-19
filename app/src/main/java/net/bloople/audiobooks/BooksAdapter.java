@@ -30,11 +30,8 @@ class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     Context context = v.getContext();
-                    long id = getItemId();
 
-                    Intent intent = new Intent(context, PlayAudiobookActivity.class);
-                    intent.putExtra("_id", id);
-
+                    Intent intent = Book.idTo(new Intent(context, PlayAudiobookActivity.class), getItemId());
                     context.startActivity(intent);
                 }
             });

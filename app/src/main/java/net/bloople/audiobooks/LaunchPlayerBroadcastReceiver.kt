@@ -6,9 +6,8 @@ import android.content.Intent
 
 class LaunchPlayerBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val notifyIntent = Intent(context, PlayAudiobookActivity::class.java)
+        val notifyIntent = Book.idTo(Intent(context, PlayAudiobookActivity::class.java), Book.idFrom(intent))
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        notifyIntent.putExtra("_id", Book.idFrom(intent))
         context.startActivity(notifyIntent)
     }
 }

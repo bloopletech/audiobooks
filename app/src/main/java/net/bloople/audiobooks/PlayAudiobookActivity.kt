@@ -50,9 +50,7 @@ class PlayAudiobookActivity : Activity() {
 
         playerView = findViewById(R.id.player)
 
-        val playerIntent = Intent(this.applicationContext, PlayerService::class.java).apply {
-            putExtra("_id", book._id)
-        }
+        val playerIntent = book.idTo(Intent(this.applicationContext, PlayerService::class.java))
         startService(playerIntent)
         bindService(playerIntent, connection, BIND_AUTO_CREATE)
     }

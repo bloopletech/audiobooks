@@ -62,6 +62,10 @@ internal class Book {
         db.delete("books", "_id=?", arrayOf(_id.toString()))
     }
 
+    fun idTo(intent: Intent): Intent {
+        return intent.apply { putExtra("_id", _id) }
+    }
+
     companion object {
         inline fun <R> edit(context: Context, id: Long, block: Book.() -> R): R {
             val book = find(context, id)
@@ -103,6 +107,11 @@ internal class Book {
             return intent!!.getLongExtra("_id", -1).also {
                 if(it == -1L) throw IllegalArgumentException("Intent missing extra _id of type long")
             }
+        }
+
+        @JvmStatic
+        fun idTo(intent: Intent, id: Long): Intent {
+            return intent.apply { putExtra("_id", id) }
         }
     }
 }

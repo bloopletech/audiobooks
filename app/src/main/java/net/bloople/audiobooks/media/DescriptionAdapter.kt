@@ -23,6 +23,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import net.bloople.audiobooks.Book
 import net.bloople.audiobooks.PlayerService
 
 /**
@@ -61,7 +62,7 @@ class DescriptionAdapter(private val context: PlayerService) :
         }
         val matches = context.packageManager.queryBroadcastReceivers(intent, 0)
 
-        val explicit = Intent(intent)
+        val explicit = Book.idTo(Intent(intent), context.bookId)
         for (resolveInfo in matches) {
             val componentName = ComponentName(
                 resolveInfo.activityInfo.applicationInfo.packageName,
@@ -70,7 +71,6 @@ class DescriptionAdapter(private val context: PlayerService) :
 
             explicit.component = componentName
         }
-        explicit.putExtra("_id", context.bookId)
 
         return PendingIntent.getBroadcast(context, 1, explicit, PendingIntent.FLAG_UPDATE_CURRENT)
     }
