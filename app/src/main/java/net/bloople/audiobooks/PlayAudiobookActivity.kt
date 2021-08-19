@@ -2,7 +2,6 @@ package net.bloople.audiobooks
 
 import android.app.Activity
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
@@ -43,27 +42,24 @@ class PlayAudiobookActivity : Activity() {
         val intent: Intent = getIntent()
         bookId = intent.getLongExtra("_id", -1)
 
-        val book = Book.findById(this, bookId)
-        book.lastOpenedAt(System.currentTimeMillis())
-        book.save(this)
+        val book = Book.find(this, bookId)
+        book.edit(this) { lastOpenedAt = System.currentTimeMillis() }
 
         val titleView: TextView = findViewById(R.id.exo_title)
-        titleView.setText(book.title())
+        titleView.text = book.title
 
         playerView = findViewById(R.id.player)
 
         val playerIntent = Intent(this.applicationContext, PlayerService::class.java).apply {
-            putExtra("_id", book.id())
+            putExtra("_id", book._id)
         }
         startService(playerIntent)
-        bindService(playerIntent, connection, Context.BIND_AUTO_CREATE)
+        bindService(playerIntent, connection, BIND_AUTO_CREATE)
     }
 
     override fun onStop() {
         super.onStop()
-        val book = Book.findById(this, bookId)
-        book.lastOpenedAt(System.currentTimeMillis())
-        book.save(this)
+        Book.edit(this, bookId) { lastOpenedAt = System.currentTimeMillis() }
     }
 
     override fun onBackPressed() {

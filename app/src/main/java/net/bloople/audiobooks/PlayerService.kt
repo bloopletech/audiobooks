@@ -150,14 +150,14 @@ class PlayerService : IntentService("audiobooks") {
 
     // Prepare playback.
     fun start() {
-        val book = Book.findById(this, bookId) ?: return
-        playerState = PlayerState(position = book.lastReadPosition())
+        val book = Book.find(this, bookId)
+        playerState = PlayerState(position = book.lastReadPosition)
         with(player) {
             // Restore state (after onResume()/onStart())
-            val originalMediaItem = MediaItem.fromUri(book.uri())
+            val originalMediaItem = MediaItem.fromUri(book.uri)
             val mediaItem = originalMediaItem.buildUpon().apply {
                 setMediaMetadata(originalMediaItem.mediaMetadata.buildUpon().apply {
-                    setTitle(book.title())
+                    setTitle(book.title)
                 }.build())
             }.build()
 
@@ -196,10 +196,8 @@ class PlayerService : IntentService("audiobooks") {
 
     private fun savePosition() {
         if (bookId == -1L) return;
-        val position = player.currentPosition
-        val lastReadPosition = if (position == C.TIME_UNSET || position >= player.duration) 0 else position
-        val book = Book.findById(this@PlayerService, bookId)
-        book.lastReadPosition(lastReadPosition)
-        book.save(this@PlayerService)
+        val currentPosition = player.currentPosition
+        val position = if (currentPosition == C.TIME_UNSET || currentPosition >= player.duration) 0 else currentPosition
+        Book.edit(this, bookId) { lastReadPosition = position }
     }
 }

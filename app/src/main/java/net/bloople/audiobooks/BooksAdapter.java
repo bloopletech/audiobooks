@@ -51,10 +51,10 @@ class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
                     Context context = view.getContext();
                     long id = getItemId();
 
-                    Book book = Book.findById(context, id);
-                    boolean starred = !book.starred();
+                    Book book = Book.findByIdOrNull(context, id);
+                    boolean starred = !book.getStarred();
 
-                    book.starred(starred);
+                    book.setStarred(starred);
                     book.save(context);
 
                     view.setActivated(starred);
@@ -84,16 +84,16 @@ class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
     public void onBindViewHolder(BooksAdapter.ViewHolder holder, Cursor cursor) {
         Book book = new Book(cursor);
 
-        holder.titleView.setText(book.title());
+        holder.titleView.setText(book.getTitle());
 
-        holder.sizeView.setText(getReadableTimeDuration(book.size()));
+        holder.sizeView.setText(getReadableTimeDuration(book.getSize()));
 
         if(holder.ageView != null) {
-            String age = DATE_FORMAT.format(new Date(book.mtime()));
+            String age = DATE_FORMAT.format(new Date(book.getMtime()));
             holder.ageView.setText(age);
         }
 
-        long lastOpenedMillis = book.lastOpenedAt();
+        long lastOpenedMillis = book.getLastOpenedAt();
         if(lastOpenedMillis > 0L) {
             String lastOpened = DATE_FORMAT.format(new Date(lastOpenedMillis));
             holder.lastOpenedView.setText(lastOpened);
@@ -102,7 +102,7 @@ class BooksAdapter extends CursorRecyclerAdapter<BooksAdapter.ViewHolder> {
             holder.lastOpenedView.setText("Never");
         }
 
-        holder.starView.setActivated(book.starred());
+        holder.starView.setActivated(book.getStarred());
     }
 
     //Copied from https://github.com/nbsp-team/MaterialFilePicker
