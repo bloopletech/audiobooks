@@ -14,6 +14,7 @@ internal class Book {
     var mtime: Long = 0
     var size: Long = 0
     var lastOpenedAt: Long = 0
+    var openedCount: Int = 0
     var lastReadPosition: Long = 0
     var starred = false
 
@@ -25,6 +26,7 @@ internal class Book {
         mtime = result.getLong(result.getColumnIndex("mtime"))
         size = result.getLong(result.getColumnIndex("size"))
         lastOpenedAt = result.getLong(result.getColumnIndex("last_opened_at"))
+        openedCount = result.getInt(result.getColumnIndex("opened_count"))
         lastReadPosition = result.getLong(result.getColumnIndex("last_read_position"))
         starred = result.getInt(result.getColumnIndex("starred")) == 1
     }
@@ -41,6 +43,7 @@ internal class Book {
             put("mtime", mtime)
             put("size", size)
             put("last_opened_at", lastOpenedAt)
+            put("opened_count", openedCount)
             put("last_read_position", lastReadPosition)
             put("starred", if (starred) 1 else 0)
         }

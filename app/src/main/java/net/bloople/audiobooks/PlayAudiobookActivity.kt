@@ -43,7 +43,10 @@ class PlayAudiobookActivity : Activity() {
         bookId = Book.idFrom(intent)
 
         val book = Book.find(this, bookId)
-        book.edit(this) { lastOpenedAt = System.currentTimeMillis() }
+        book.edit(this) {
+            lastOpenedAt = System.currentTimeMillis()
+            openedCount += 1
+        }
 
         val titleView: TextView = findViewById(R.id.exo_title)
         titleView.text = book.title

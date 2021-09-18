@@ -58,6 +58,21 @@
                 android:drawablePadding="4dp" />
 
             <TextView
+                android:id="@+id/story_opened_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#8A000000"
+                android:textAlignment="viewStart"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:layout_weight="0.15"
+                android:layout_gravity="center"
+                android:maxLines="1"
+                android:drawableStart="@drawable/baseline_favorite_18"
+                android:drawablePadding="4dp" />
+
+            <TextView
                 android:id="@+id/story_age"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -74,7 +89,7 @@
             <Space
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.25" />
+                android:layout_weight="0.1" />
         </LinearLayout>
     </LinearLayout>
 

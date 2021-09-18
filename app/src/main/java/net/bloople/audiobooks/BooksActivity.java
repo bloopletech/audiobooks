@@ -138,9 +138,9 @@ public class BooksActivity extends AppCompatActivity {
         else if(menuItem.getItemId() == R.id.sort_starred) {
             newSortMethod = BooksSearcher.SORT_STARRED;
         }
-//        else if(menuItem.getItemId() == R.id.sort_opened_count) {
-//            newSortMethod = BooksSearcher.SORT_OPENED_COUNT;
-//        }
+        else if(menuItem.getItemId() == R.id.sort_opened_count) {
+            newSortMethod = BooksSearcher.SORT_OPENED_COUNT;
+        }
         else if(menuItem.getItemId() == R.id.manage_indexing) {
             Intent intent = new Intent(BooksActivity.this, IndexingActivity.class);
             startActivity(intent);

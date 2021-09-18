@@ -20,6 +20,11 @@
         android:icon="@drawable/ic_visibility_white_24dp"
         app:showAsAction="always" />
     <item
+        android:id="@+id/sort_opened_count"
+        android:title="Opened Count"
+        android:icon="@drawable/baseline_favorite_24"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/sort_starred"
         android:title="Starred"
         android:icon="@drawable/ic_star_white_24dp"

@@ -10,7 +10,7 @@ public class BooksSearcher {
     public static final int SORT_SIZE = 2;
     public static final int SORT_LAST_OPENED = 3;
     public static final int SORT_STARRED = 4;
-    //public static final int SORT_OPENED_COUNT = 5;
+    public static final int SORT_OPENED_COUNT = 5;
 
     private String searchText = "";
     private int sortMethod = SORT_AGE;
@@ -53,7 +53,7 @@ public class BooksSearcher {
             case SORT_AGE: return "Published Date";
             case SORT_SIZE: return "Size";
             case SORT_LAST_OPENED: return "Last Opened At";
-            //case SORT_OPENED_COUNT: return "Opened Count";
+            case SORT_OPENED_COUNT: return "Opened Count";
             //case SORT_RANDOM: return "Random";
             case SORT_STARRED: return "Starred";
             default: throw new IllegalStateException("sort_method not in valid range");
@@ -83,9 +83,9 @@ public class BooksSearcher {
             case SORT_STARRED:
                 orderBy += "starred";
                 break;
-//            case SORT_OPENED_COUNT:
-//                orderBy += "opened_count";
-//                break;
+            case SORT_OPENED_COUNT:
+                orderBy += "opened_count";
+                break;
         }
 
         if(sortDirectionAsc) orderBy += " ASC";
