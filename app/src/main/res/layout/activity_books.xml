@@ -27,6 +27,17 @@
             android:minEms="15"
             android:drawableEnd="@drawable/ic_clear_white_24dp" />
     </androidx.appcompat.widget.Toolbar>
+    <TextView
+        android:id="@+id/search_results_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="12dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="#666666"
+        android:elevation="4dp" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/audiobooks_list"
         android:layout_width="match_parent"

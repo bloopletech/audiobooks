@@ -1,15 +1,12 @@
 package net.bloople.audiobooks;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -22,30 +19,29 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import androidx.appcompat.widget.Toolbar;
 
 public class BooksActivity extends AppCompatActivity {
-    public static final int SORT_ALPHABETIC = 0;
-    public static final int SORT_AGE = 1;
-    public static final int SORT_SIZE = 2;
-    public static final int SORT_LAST_OPENED = 3;
-    public static final int SORT_STARRED = 4;
-
-    private int sortMethod;
-    private boolean sortDirectionAsc;
-    private String searchText = "";
-
+    private IndexViewModel model;
     private RecyclerView listView;
     private BooksAdapter adapter;
     private LinearLayoutManager layoutManager;
+    private TextView searchResultsToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_books);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        model = new ViewModelProvider(this).get(IndexViewModel.class);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        searchResultsToolbar = findViewById(R.id.search_results_toolbar);
+
+        model.getSorterDescription().observe(this, description -> {
+            searchResultsToolbar.setText(description);
+        });
 
         final EditText searchField = (EditText)findViewById(R.id.searchText);
         searchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -57,8 +53,7 @@ public class BooksActivity extends AppCompatActivity {
                     in.hideSoftInputFromWindow(searchField.getWindowToken(), 0);
                     searchField.clearFocus();
 
-                    searchText = v.getText().toString();
-                    updateCursor();
+                    model.setSearchText(v.getText().toString());
 
                     handled = true;
                 }
@@ -73,13 +68,13 @@ public class BooksActivity extends AppCompatActivity {
 
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     int clickIndex = searchField.getRight() -
-                            searchField.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width();
+                        searchField.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width();
 
                     if(event.getRawX() >= clickIndex) {
                         searchField.setText("");
                         searchField.clearFocus();
-                        searchText = "";
-                        updateCursor();
+
+                        model.setSearchText("");
 
                         return true;
                     }
@@ -94,21 +89,23 @@ public class BooksActivity extends AppCompatActivity {
 
         layoutManager = new LinearLayoutManager(this);
         listView.setLayoutManager(layoutManager);
+
+        model.getSearchResults().observe(this, searchResults -> {
+            adapter.swapCursor(searchResults);
+        });
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        loadPreferences();
-        updateCursor();
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        model.setSort(savedInstanceState.getInt("sortMethod"), savedInstanceState.getBoolean("sortDirectionAsc"));
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-
-        savePreferences();
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt("sortMethod", model.getSortMethod());
+        savedInstanceState.putBoolean("sortDirectionAsc", model.getSortDirectionAsc());
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -123,107 +120,37 @@ public class BooksActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
+        int sortMethod = model.getSortMethod();
+        int newSortMethod = sortMethod;
+
         if(menuItem.getItemId() == R.id.sort_alphabetic) {
-            if(sortMethod == SORT_ALPHABETIC) sortDirectionAsc = !sortDirectionAsc;
-            sortMethod = SORT_ALPHABETIC;
+            newSortMethod = BooksSearcher.SORT_ALPHABETIC;
         }
         else if(menuItem.getItemId() == R.id.sort_age) {
-            if(sortMethod == SORT_AGE) sortDirectionAsc = !sortDirectionAsc;
-            sortMethod = SORT_AGE;
+            newSortMethod = BooksSearcher.SORT_AGE;
         }
         else if(menuItem.getItemId() == R.id.sort_size) {
-            if(sortMethod == SORT_SIZE) sortDirectionAsc = !sortDirectionAsc;
-            sortMethod = SORT_SIZE;
+            newSortMethod = BooksSearcher.SORT_SIZE;
         }
         else if(menuItem.getItemId() == R.id.sort_last_opened) {
-            if(sortMethod == SORT_LAST_OPENED) sortDirectionAsc = !sortDirectionAsc;
-            sortMethod = SORT_LAST_OPENED;
+            newSortMethod = BooksSearcher.SORT_LAST_OPENED;
         }
         else if(menuItem.getItemId() == R.id.sort_starred) {
-            if(sortMethod == SORT_STARRED) sortDirectionAsc = !sortDirectionAsc;
-            sortMethod = SORT_STARRED;
+            newSortMethod = BooksSearcher.SORT_STARRED;
         }
+//        else if(menuItem.getItemId() == R.id.sort_opened_count) {
+//            newSortMethod = BooksSearcher.SORT_OPENED_COUNT;
+//        }
         else if(menuItem.getItemId() == R.id.manage_indexing) {
             Intent intent = new Intent(BooksActivity.this, IndexingActivity.class);
             startActivity(intent);
+            return true;
         }
 
-        updateCursor();
+        boolean sortDirectionAsc = model.getSortDirectionAsc();
+        if(sortMethod == newSortMethod) sortDirectionAsc = !sortDirectionAsc;
+        model.setSort(newSortMethod, sortDirectionAsc);
 
         return true;
-    }
-
-    private SharedPreferences preferences() {
-        return getApplicationContext().getSharedPreferences("books-list", Context.MODE_PRIVATE);
-    }
-
-    private void loadPreferences() {
-        SharedPreferences preferences = preferences();
-
-        sortMethod = preferences.getInt("last-sort-method", SORT_LAST_OPENED);
-        sortDirectionAsc = preferences.getBoolean("last-sort-direction-asc", false);
-    }
-
-    private void savePreferences() {
-        SharedPreferences.Editor editor = preferences().edit();
-        editor.putInt("last-sort-method", sortMethod);
-        editor.putBoolean("last-sort-direction-asc", sortDirectionAsc);
-        editor.apply();
-    }
-
-    private void updateCursor() {
-        String orderBy = "";
-
-        switch(sortMethod) {
-            case SORT_ALPHABETIC:
-                orderBy += "title";
-                break;
-            case SORT_AGE:
-                orderBy += "mtime";
-                break;
-            case SORT_SIZE:
-                orderBy += "size";
-                break;
-            case SORT_LAST_OPENED:
-                orderBy += "last_opened_at";
-                break;
-            case SORT_STARRED:
-                orderBy += "starred";
-                break;
-        }
-
-        if(sortDirectionAsc) orderBy += " ASC";
-        else orderBy += " DESC";
-
-        orderBy += ", title ASC";
-
-        SearchBooksTask searcher = new SearchBooksTask();
-        searcher.execute(searchText, orderBy);
-    }
-
-    private class SearchBooksTask extends AsyncTask<String, Void, Cursor> {
-        protected Cursor doInBackground(String... params) {
-            String searchText = params[0];
-            String orderBy = params[1];
-
-            SQLiteDatabase db = DatabaseHelper.instance(BooksActivity.this);
-
-            Cursor cursor;
-            if(!searchText.equals("")) {
-                cursor = db.query("books", null, "title LIKE ?",
-                        new String[] { "%" + searchText + "%" }, null, null, orderBy);
-            }
-            else {
-                cursor = db.query("books", null, null, null, null, null, orderBy);
-            }
-
-            cursor.moveToFirst();
-
-            return cursor;
-        }
-
-        protected void onPostExecute(Cursor cursor) {
-            adapter.swapCursor(cursor);
-        }
     }
 }
