@@ -57,6 +57,10 @@ public class IndexViewModel extends AndroidViewModel {
         resolve();
     }
 
+    public void refresh() {
+        resolve();
+    }
+
     private void resolve() {
         ExecutorService service =  Executors.newSingleThreadExecutor();
         service.submit(() -> {

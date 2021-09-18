@@ -21,6 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class BooksActivity extends AppCompatActivity {
+    private static final int REQUEST_CODE_INDEXING = 0;
+
     private IndexViewModel model;
     private RecyclerView listView;
     private BooksAdapter adapter;
@@ -143,7 +145,7 @@ public class BooksActivity extends AppCompatActivity {
         }
         else if(menuItem.getItemId() == R.id.manage_indexing) {
             Intent intent = new Intent(BooksActivity.this, IndexingActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_CODE_INDEXING);
             return true;
         }
 
@@ -152,5 +154,14 @@ public class BooksActivity extends AppCompatActivity {
         model.setSort(newSortMethod, sortDirectionAsc);
 
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == REQUEST_CODE_INDEXING && resultCode == RESULT_OK) {
+            model.refresh();
+        }
     }
 }
