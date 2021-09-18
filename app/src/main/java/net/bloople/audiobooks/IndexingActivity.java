@@ -27,23 +27,16 @@ public class IndexingActivity extends Activity implements Indexable {
     private ProgressBar progressBar;
     private Button indexButton;
     private String indexRoot;
-    private boolean canAccessFiles;
+    private boolean canAccessFiles = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_indexing);
 
-        if(android.os.Build.VERSION.SDK_INT >= 23) {
-            int permission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-            canAccessFiles = false;
-            if(permission == PackageManager.PERMISSION_GRANTED) canAccessFiles = true;
-            else requestPermissions(PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
-        }
-        else {
-            canAccessFiles = true;
-        }
+        int permission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(permission == PackageManager.PERMISSION_GRANTED) canAccessFiles = true;
+        else requestPermissions(PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
 
         progressBar = findViewById(R.id.indexing_progress);
 
