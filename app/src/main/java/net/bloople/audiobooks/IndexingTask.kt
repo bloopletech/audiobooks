@@ -75,7 +75,7 @@ internal class IndexingTask(private val context: Context, private val indexable:
             val retriever = MediaMetadataRetriever()
             retriever.setDataSource(path)
             val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            duration.toInt()
+            duration?.toInt() ?: 0
         } catch (e: RuntimeException) {
             e.printStackTrace()
             0
