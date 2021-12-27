@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:theme="@style/AppTheme.ActionBar">
+    <ImageButton
+        android:id="@+id/import_database"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/actionBarItemBackground"
+        android:src="@drawable/ic_baseline_settings_backup_restore_24" />
+
+    <ImageButton
+        android:id="@+id/export_database"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/actionBarItemBackground"
+        android:src="@drawable/ic_baseline_save_alt_24" />
+</LinearLayout>

@@ -3,46 +3,71 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="net.bloople.audiobooks.IndexingActivity"
     android:background="#ffffff"
     android:orientation="vertical"
     android:focusableInTouchMode="true">
-
-    <ProgressBar
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:id="@+id/indexing_progress"
-        style="@android:style/Widget.Material.Light.ProgressBar.Horizontal"
-        android:maxHeight="4dp"
-        android:indeterminate="false" />
-
-    <EditText
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:id="@+id/index_directory"
-        android:inputType="text"
-        android:maxLines="1" />
+        android:minHeight="?android:attr/actionBarSize"
+        android:background="?android:attr/colorPrimary"
+        android:theme="@style/AppTheme.ActionBar"
+        app:title="Manage Indexing">
+        <androidx.fragment.app.FragmentContainerView
+            android:name="net.bloople.audiobooks.DatabaseManagementFragment"
+            android:id="@+id/database_management_framework"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout="@layout/database_management_framework"
+            android:layout_gravity="right" />
+    </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:text="Index..."
-            android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="16dp">
+        <EditText
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/index_button"
-            android:layout_gravity="center"
-            android:layout_weight="1" />
+            android:ems="10"
+            android:id="@+id/index_directory"
+            android:inputType="text"
+            android:maxLines="1" />
 
-        <Button
-            android:text="Delete Index"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/delete_index_button"
-            android:layout_gravity="center"
-            android:layout_weight="1" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:text="Index..."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/index_button"
+                android:layout_gravity="center"
+                android:layout_weight="1" />
+
+            <Button
+                android:text="Delete Index"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/delete_index_button"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                style="@style/Widget.MaterialComponents.Button.TextButton" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:id="@+id/indexing_progress"
+            style="@android:style/Widget.Material.Light.ProgressBar.Horizontal"
+            android:maxHeight="4dp"
+            android:indeterminate="false"
+            android:layout_marginTop="16sp" />
     </LinearLayout>
 </LinearLayout>
