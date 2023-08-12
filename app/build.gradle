@@ -17,9 +17,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    lintOptions {
-        abortOnError false
-    }
     buildTypes {
         release {
             minifyEnabled false
@@ -29,6 +26,10 @@ android {
             applicationIdSuffix ".debug"
         }
     }
+    lint {
+        abortOnError false
+    }
+    namespace 'net.bloople.audiobooks'
 }
 
 dependencies {

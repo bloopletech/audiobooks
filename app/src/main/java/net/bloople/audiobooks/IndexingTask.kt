@@ -12,6 +12,7 @@ internal class IndexingTask(private val context: Context, private val indexable:
     private var progress = 0
     private var max = 0
     private var indexed = 0
+    @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: String?): Void? {
         destroyDeleted()
         indexDirectory(File(params[0]))
@@ -19,10 +20,12 @@ internal class IndexingTask(private val context: Context, private val indexable:
         return null
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onProgressUpdate(vararg args: Int?) {
         indexable.onIndexingProgress(args[0]!!, args[1]!!)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPostExecute(result: Void?) {
         indexable.onIndexingComplete(indexed)
     }

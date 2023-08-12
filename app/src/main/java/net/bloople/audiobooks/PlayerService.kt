@@ -52,6 +52,7 @@ class PlayerService : IntentService("audiobooks") {
 
     private lateinit var playerNotificationManager: PlayerNotificationManager
 
+    @Deprecated("Deprecated in Java")
     override fun onCreate() {
         super.onCreate()
 
@@ -126,10 +127,12 @@ class PlayerService : IntentService("audiobooks") {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBind(intent: Intent?): IBinder {
         return PlayerServiceBinder()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         stop()
 
@@ -139,6 +142,7 @@ class PlayerService : IntentService("audiobooks") {
         return Service.START_STICKY
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onDestroy() {
         super.onDestroy()
         stop()
@@ -192,6 +196,7 @@ class PlayerService : IntentService("audiobooks") {
         fun getPlayerInstance() = player
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onHandleIntent(intent: Intent?) {}
 
     private fun savePosition() {
