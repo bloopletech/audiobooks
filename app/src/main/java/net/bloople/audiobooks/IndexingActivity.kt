@@ -1,22 +1,14 @@
 package net.bloople.audiobooks
 
-import android.Manifest
 import net.bloople.audiobooks.DatabaseHelper.deleteDatabase
-import android.app.Activity
-import net.bloople.audiobooks.Indexable
 import android.os.Bundle
-import net.bloople.audiobooks.R
-import android.content.pm.PackageManager
-import net.bloople.audiobooks.IndexingActivity
-import net.bloople.audiobooks.IndexingTask
-import net.bloople.audiobooks.DatabaseHelper
-import android.widget.TextView.OnEditorActionListener
 import android.view.inputmethod.EditorInfo
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Environment
+import android.provider.Settings
 import android.view.KeyEvent
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -34,9 +26,13 @@ class IndexingActivity : AppCompatActivity(), Indexable {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        val permission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        if (permission == PackageManager.PERMISSION_GRANTED) canAccessFiles = true
-        else requestPermissions(PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE)
+        if(Environment.isExternalStorageManager()) {
+            canAccessFiles = true
+        }
+        else {
+            val uri = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
+            startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri))
+        }
 
         progressBar = findViewById(R.id.indexing_progress)
         indexButton = findViewById(R.id.index_button)
@@ -74,12 +70,6 @@ class IndexingActivity : AppCompatActivity(), Indexable {
         if (resultCode == RESULT_CANCELED) finish()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(requestCode == REQUEST_EXTERNAL_STORAGE && grantResults.isNotEmpty()
-            && grantResults[0] == PackageManager.PERMISSION_GRANTED) canAccessFiles = true
-    }
-
     private fun preferences(): SharedPreferences {
         return applicationContext.getSharedPreferences("main", MODE_PRIVATE)
     }
@@ -107,14 +97,5 @@ class IndexingActivity : AppCompatActivity(), Indexable {
             this@IndexingActivity, "Indexing complete, $count audiobooks indexed.",
             Toast.LENGTH_LONG
         ).show()
-    }
-
-    companion object {
-        // Storage Permissions
-        private const val REQUEST_EXTERNAL_STORAGE = 1
-        private val PERMISSIONS_STORAGE = arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
     }
 }

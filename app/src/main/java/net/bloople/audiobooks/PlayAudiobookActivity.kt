@@ -1,14 +1,18 @@
 package net.bloople.audiobooks
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.widget.TextView
 import com.google.android.exoplayer2.ui.StyledPlayerControlView
 
+@Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 class PlayAudiobookActivity : Activity() {
     private var bookId: Long = -1
     private var playerView: StyledPlayerControlView? = null
@@ -35,6 +39,7 @@ class PlayAudiobookActivity : Activity() {
         }
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play_audiobook)
@@ -53,9 +58,22 @@ class PlayAudiobookActivity : Activity() {
 
         playerView = findViewById(R.id.player)
 
+        val permission = checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+        if (permission == PackageManager.PERMISSION_GRANTED) completeCreate()
+        else requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_POST_NOTIFICATIONS)
+    }
+
+    private fun completeCreate() {
+        val book = Book.find(this, bookId)
         val playerIntent = book.idTo(Intent(this.applicationContext, PlayerService::class.java))
         startService(playerIntent)
         bindService(playerIntent, connection, BIND_AUTO_CREATE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if(requestCode == REQUEST_POST_NOTIFICATIONS && grantResults.isNotEmpty()
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) completeCreate()
     }
 
     override fun onStop() {
@@ -74,5 +92,9 @@ class PlayAudiobookActivity : Activity() {
             serviceBound = false
             unbindService(connection)
         }
+    }
+
+    companion object {
+        private const val REQUEST_POST_NOTIFICATIONS = 1
     }
 }
