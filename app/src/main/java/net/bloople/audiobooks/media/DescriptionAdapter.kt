@@ -15,6 +15,8 @@
  */
 //Changed by Brenton Fletcher
 
+@file:Suppress("DEPRECATION")
+
 package net.bloople.audiobooks.media
 
 import android.app.PendingIntent
@@ -31,16 +33,16 @@ import net.bloople.audiobooks.PlayerService
  * http://github.com/beraldofilippo
  */
 class DescriptionAdapter(private val context: PlayerService) :
-    PlayerNotificationManager.MediaDescriptionAdapter {
+        PlayerNotificationManager.MediaDescriptionAdapter {
 
     override fun getCurrentContentTitle(player: Player): String =
-        player.mediaMetadata.title.toString()
+            player.mediaMetadata.title.toString()
 
     override fun getCurrentContentText(player: Player): String? = null
 
     override fun getCurrentLargeIcon(
-        player: Player,
-        callback: PlayerNotificationManager.BitmapCallback
+            player: Player,
+            callback: PlayerNotificationManager.BitmapCallback
     ): Bitmap? = null
 
     /**
@@ -48,29 +50,10 @@ class DescriptionAdapter(private val context: PlayerService) :
      * This pending intent will fire a broadcast, which will be captured by a BroadcastReceiver
      * we have to put in the app module.
      * The broadcast receiver will intercept this intent and start the player activity.
-     *
-     * Since I want this component to be decoupled from the PlayerActivity implementation
-     * here I have to do a workaround, using polling and forging an explicit Intent (as I do not know which
-     * is the name of the player activity I would have to start) because of the security
-     * limitations introduced on O+.
-     *
-     * https://commonsware.com/blog/2017/04/11/android-o-implicit-broadcast-ban.html
      * */
     override fun createCurrentContentIntent(player: Player): PendingIntent? {
-        val intent = Intent().apply {
-            action = "net.bloople.audiobooks.LAUNCH_PLAYER_ACTIVITY"
-        }
-        val matches = context.packageManager.queryBroadcastReceivers(intent, 0)
-
-        val explicit = Book.idTo(Intent(intent), context.bookId)
-        for (resolveInfo in matches) {
-            val componentName = ComponentName(
-                resolveInfo.activityInfo.applicationInfo.packageName,
-                resolveInfo.activityInfo.name
-            )
-
-            explicit.component = componentName
-        }
+        val explicit = Book.idTo(Intent("net.bloople.audiobooks.LAUNCH_PLAYER_ACTIVITY"), context.bookId)
+        explicit.component = ComponentName(context, "net.bloople.audiobooks.LaunchPlayerBroadcastReceiver")
 
         return PendingIntent.getBroadcast(
             context,

@@ -15,30 +15,30 @@
  */
 //Changed by Brenton Fletcher
 
+@file:Suppress("DEPRECATION")
+
 package net.bloople.audiobooks
 
 import android.app.IntentService
 import android.app.Notification
 import android.app.Service
-import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
 import android.os.Binder
 import android.os.IBinder
-import androidx.media.AudioAttributesCompat
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.extractor.mp3.Mp3Extractor
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import net.bloople.audiobooks.media.DescriptionAdapter
 import net.bloople.audiobooks.player.PlayerState
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
-import net.bloople.audiobooks.player.AudioFocusWrapper
 
 /**
  * Created by Filippo Beraldo on 15/11/2018.
  * http://github.com/beraldofilippo
  */
+@Suppress("OVERRIDE_DEPRECATION")
 class PlayerService : IntentService("audiobooks") {
     companion object {
         const val NOTIFICATION_ID = 100
@@ -47,12 +47,11 @@ class PlayerService : IntentService("audiobooks") {
 
     var bookId: Long = -1
 
-    private lateinit var player: ExoPlayer
+    private lateinit var player: SimpleExoPlayer
     private var playerState: PlayerState? = null
 
     private lateinit var playerNotificationManager: PlayerNotificationManager
 
-    @Deprecated("Deprecated in Java")
     override fun onCreate() {
         super.onCreate()
 
@@ -60,27 +59,21 @@ class PlayerService : IntentService("audiobooks") {
             .setConstantBitrateSeekingEnabled(true)
             .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING)
 
-        val exoPlayer = SimpleExoPlayer.Builder(this).apply {
+        player = SimpleExoPlayer.Builder(this).apply {
             setMediaSourceFactory(DefaultMediaSourceFactory(this@PlayerService, extractorsFactory))
             //player.setWakeMode(C.WAKE_MODE_LOCAL)
         }.build()
 
-        val audioManager = this.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val audioAttributes = AudioAttributesCompat.Builder()
-            .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
-            .setUsage(AudioAttributesCompat.USAGE_MEDIA)
+        val audioAttributes = AudioAttributes.Builder()
+            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+            .setUsage(C.USAGE_MEDIA)
             .build()
-        player = AudioFocusWrapper(
-            audioAttributes,
-            audioManager,
-            exoPlayer
-        ).apply {
-            addListener(object : Player.Listener {
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    if(!isPlaying) savePosition()
-                }
-            })
-        }
+        player.setAudioAttributes(audioAttributes, true)
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if(!isPlaying) savePosition()
+            }
+        })
 
         /** Build a notification manager for our player, set a notification listener to this,
          * and assign the player just created.
@@ -127,12 +120,10 @@ class PlayerService : IntentService("audiobooks") {
         }
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onBind(intent: Intent?): IBinder {
         return PlayerServiceBinder()
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         stop()
 
@@ -142,7 +133,6 @@ class PlayerService : IntentService("audiobooks") {
         return Service.START_STICKY
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onDestroy() {
         super.onDestroy()
         stop()
@@ -153,7 +143,7 @@ class PlayerService : IntentService("audiobooks") {
     }
 
     // Prepare playback.
-    fun start() {
+    private fun start() {
         val book = Book.find(this, bookId)
         playerState = PlayerState(position = book.lastReadPosition)
         with(player) {
@@ -196,11 +186,10 @@ class PlayerService : IntentService("audiobooks") {
         fun getPlayerInstance() = player
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onHandleIntent(intent: Intent?) {}
 
     private fun savePosition() {
-        if (bookId == -1L) return;
+        if (bookId == -1L) return
         val currentPosition = player.currentPosition
         val position = if (currentPosition == C.TIME_UNSET || currentPosition >= player.duration) 0 else currentPosition
         Book.edit(this, bookId) { lastReadPosition = position }

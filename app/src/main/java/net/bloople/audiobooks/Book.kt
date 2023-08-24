@@ -20,15 +20,15 @@ internal class Book {
 
     constructor()
     constructor(result: Cursor) {
-        _id = result.getLong(result.getColumnIndex("_id"))
-        path = result.getString(result.getColumnIndex("path"))
-        title = result.getString(result.getColumnIndex("title"))
-        mtime = result.getLong(result.getColumnIndex("mtime"))
-        size = result.getLong(result.getColumnIndex("size"))
-        lastOpenedAt = result.getLong(result.getColumnIndex("last_opened_at"))
-        openedCount = result.getInt(result.getColumnIndex("opened_count"))
-        lastReadPosition = result.getLong(result.getColumnIndex("last_read_position"))
-        starred = result.getInt(result.getColumnIndex("starred")) == 1
+        _id = result.getLong(result.getColumnIndexOrThrow("_id"))
+        path = result.getString(result.getColumnIndexOrThrow("path"))
+        title = result.getString(result.getColumnIndexOrThrow("title"))
+        mtime = result.getLong(result.getColumnIndexOrThrow("mtime"))
+        size = result.getLong(result.getColumnIndexOrThrow("size"))
+        lastOpenedAt = result.getLong(result.getColumnIndexOrThrow("last_opened_at"))
+        openedCount = result.getInt(result.getColumnIndexOrThrow("opened_count"))
+        lastReadPosition = result.getLong(result.getColumnIndexOrThrow("last_read_position"))
+        starred = result.getInt(result.getColumnIndexOrThrow("starred")) == 1
     }
 
     val uri: String

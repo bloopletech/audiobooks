@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package net.bloople.audiobooks
 
 import android.content.Context
@@ -7,26 +9,24 @@ import java.io.File
 import java.util.*
 import java.util.regex.Pattern
 
+@Suppress("OVERRIDE_DEPRECATION")
 internal class IndexingTask(private val context: Context, private val indexable: Indexable) :
-    AsyncTask<String?, Int?, Void?>() {
+    AsyncTask<String, Int, Unit>() {
     private var progress = 0
     private var max = 0
     private var indexed = 0
-    @Deprecated("Deprecated in Java")
-    override fun doInBackground(vararg params: String?): Void? {
+
+    override fun doInBackground(vararg params: String) {
         destroyDeleted()
         indexDirectory(File(params[0]))
         publishProgress(progress, max)
-        return null
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onProgressUpdate(vararg args: Int?) {
         indexable.onIndexingProgress(args[0]!!, args[1]!!)
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onPostExecute(result: Void?) {
+    override fun onPostExecute(result: Unit?) {
         indexable.onIndexingComplete(indexed)
     }
 
@@ -36,7 +36,7 @@ internal class IndexingTask(private val context: Context, private val indexable:
             max += it.count
             while (it.moveToNext()) {
                 val book = Book(it)
-                val file = File(book.path)
+                val file = File(book.path!!)
                 if (!file.exists()) book.destroy(context)
                 progress++
                 publishProgress(progress, max)
@@ -48,11 +48,8 @@ internal class IndexingTask(private val context: Context, private val indexable:
         val files = directory.listFiles() ?: return
         val filesToIndex = ArrayList<File>()
         for (f in files) {
-            if (f.isDirectory) {
-                indexDirectory(f)
-            } else {
-                if (AUDIOBOOK_EXTENSIONS.matcher(f.name).find()) filesToIndex.add(f)
-            }
+            if (f.isDirectory) indexDirectory(f)
+            else if (AUDIOBOOK_EXTENSIONS.matcher(f.name).find()) filesToIndex.add(f)
         }
         max += filesToIndex.size
         publishProgress(progress, max)

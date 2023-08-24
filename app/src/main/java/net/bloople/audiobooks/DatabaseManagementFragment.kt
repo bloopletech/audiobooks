@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import java.io.IOException
 
+@Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 class DatabaseManagementFragment : Fragment() {
     private lateinit var importDatabaseButton: ImageButton
     private lateinit var exportDatabaseButton: ImageButton
@@ -27,10 +28,9 @@ class DatabaseManagementFragment : Fragment() {
         importDatabaseButton.setOnClickListener { startImport() }
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode == REQUEST_CODE_EXPORT && resultCode == Activity.RESULT_OK) completeExport(data)
-        else if(requestCode == REQUEST_CODE_IMPORT && resultCode == Activity.RESULT_OK) completeImport(data)
+        if(requestCode == REQUEST_CODE_EXPORT && resultCode == Activity.RESULT_OK) completeExport(data!!)
+        else if(requestCode == REQUEST_CODE_IMPORT && resultCode == Activity.RESULT_OK) completeImport(data!!)
     }
 
     private fun startExport() {
@@ -41,10 +41,12 @@ class DatabaseManagementFragment : Fragment() {
         startActivityForResult(intent, REQUEST_CODE_EXPORT)
     }
 
-    private fun completeExport(data: Intent?) {
+    private fun completeExport(data: Intent) {
         try {
-            val outputStream = requireContext().contentResolver.openOutputStream(data!!.data!!)
-            DatabaseHelper.exportDatabase(requireContext(), outputStream!!)
+            requireContext().contentResolver.openOutputStream(data.data!!).use {
+                DatabaseHelper.exportDatabase(requireContext(), it!!)
+            }
+
             Toast.makeText(context, "Database exported successfully", Toast.LENGTH_LONG).show()
         }
         catch(e: IOException) {
@@ -59,10 +61,12 @@ class DatabaseManagementFragment : Fragment() {
         startActivityForResult(intent, REQUEST_CODE_IMPORT)
     }
 
-    private fun completeImport(data: Intent?) {
+    private fun completeImport(data: Intent) {
         try {
-            val inputStream = requireContext().contentResolver.openInputStream(data!!.data!!)
-            DatabaseHelper.importDatabase(requireContext(), inputStream!!)
+            requireContext().contentResolver.openInputStream(data.data!!).use {
+                DatabaseHelper.importDatabase(requireContext(), it!!)
+            }
+
             Toast.makeText(context, "Database imported successfully", Toast.LENGTH_LONG).show()
         }
         catch(e: IOException) {

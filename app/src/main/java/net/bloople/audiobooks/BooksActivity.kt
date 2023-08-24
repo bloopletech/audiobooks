@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+@Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 class BooksActivity : AppCompatActivity() {
     private lateinit var model: IndexViewModel
     private lateinit var listView: RecyclerView
@@ -128,7 +129,6 @@ class BooksActivity : AppCompatActivity() {
         return true
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

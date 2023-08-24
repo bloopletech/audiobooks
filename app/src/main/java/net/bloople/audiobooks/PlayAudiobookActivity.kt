@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package net.bloople.audiobooks
 
 import android.Manifest
@@ -12,7 +14,7 @@ import android.os.IBinder
 import android.widget.TextView
 import com.google.android.exoplayer2.ui.StyledPlayerControlView
 
-@Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+@Suppress("OVERRIDE_DEPRECATION")
 class PlayAudiobookActivity : Activity() {
     private var bookId: Long = -1
     private var playerView: StyledPlayerControlView? = null
@@ -44,7 +46,6 @@ class PlayAudiobookActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play_audiobook)
 
-        val intent: Intent = getIntent()
         bookId = Book.idFrom(intent)
 
         val book = Book.find(this, bookId)

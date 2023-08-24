@@ -5,10 +5,11 @@ import android.database.Cursor
 import net.bloople.audiobooks.DatabaseHelper.instance
 import java.lang.IllegalStateException
 
-class BooksSearcher internal constructor() {
+class BooksSearcher {
     private var searchText = ""
     var sortMethod = SORT_AGE
     var sortDirectionAsc = false
+
     fun setSearchText(inSearchText: String) {
         searchText = inSearchText
     }
@@ -18,10 +19,10 @@ class BooksSearcher internal constructor() {
     }
 
     fun description(): String {
-        return "Sorted by " + sortMethodDescription().toLowerCase() + " " + sortDirectionDescription().toLowerCase()
+        return "Sorted by ${sortMethodDescription().lowercase()} ${sortDirectionDescription().lowercase()}"
     }
 
-    fun sortMethodDescription(): String {
+    private fun sortMethodDescription(): String {
         return when (sortMethod) {
             SORT_ALPHABETIC -> "Title"
             SORT_AGE -> "Published Date"
@@ -38,25 +39,26 @@ class BooksSearcher internal constructor() {
     }
 
     private fun orderBy(): String {
-        var orderBy = ""
-        when (sortMethod) {
-            SORT_ALPHABETIC -> orderBy += "title"
-            SORT_AGE -> orderBy += "mtime"
-            SORT_SIZE -> orderBy += "size"
-            SORT_LAST_OPENED -> orderBy += "last_opened_at"
-            SORT_STARRED -> orderBy += "starred"
-            SORT_OPENED_COUNT -> orderBy += "opened_count"
+        var orderBy = when (sortMethod) {
+            SORT_ALPHABETIC -> "title"
+            SORT_AGE -> "mtime"
+            SORT_SIZE -> "size"
+            SORT_LAST_OPENED -> "last_opened_at"
+            SORT_STARRED -> "starred"
+            SORT_OPENED_COUNT -> "opened_count"
+            else -> throw IllegalArgumentException("Invalid sort method")
         }
         orderBy += if (sortDirectionAsc) " ASC" else " DESC"
         orderBy += ", title ASC"
         return orderBy
     }
 
-    fun search(context: Context?): Cursor {
-        val db = instance(context!!)
+    fun search(context: Context): Cursor {
+        val db = instance(context)
         val cursor: Cursor = if (searchText != "") {
             db.query("books", null, "title LIKE ?", arrayOf("%$searchText%"), null, null, orderBy())
-        } else {
+        }
+        else {
             db.query("books", null, null, null, null, null, orderBy())
         }
         cursor.moveToFirst()
