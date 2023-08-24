@@ -37,7 +37,8 @@ class IndexingActivity : AppCompatActivity(), Indexable {
         progressBar = findViewById(R.id.indexing_progress)
         indexButton = findViewById(R.id.index_button)
         indexButton.setOnClickListener {
-            indexButton.setEnabled(false)
+            indexButton.isEnabled = false
+
             if (canAccessFiles) {
                 val indexer = IndexingTask(this@IndexingActivity,this@IndexingActivity)
                 indexer.execute(indexRoot)
