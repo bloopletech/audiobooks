@@ -83,6 +83,6 @@ internal class IndexingTask(private val context: Context, private val indexable:
     }
 
     companion object {
-        val AUDIOBOOK_EXTENSIONS = Pattern.compile("\\.(mp3|m4a)$")
+        val AUDIOBOOK_EXTENSIONS: Pattern = Pattern.compile("(?i)\\.(m4a|mkv|mp3|mp4|wav|webm)$")
     }
 }
