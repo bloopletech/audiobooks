@@ -30,8 +30,6 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.extractor.mp3.Mp3Extractor
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-import net.bloople.audiobooks.media.DescriptionAdapter
-import net.bloople.audiobooks.player.PlayerState
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 
 /**

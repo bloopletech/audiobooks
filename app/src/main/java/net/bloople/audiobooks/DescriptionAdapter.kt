@@ -17,16 +17,13 @@
 
 @file:Suppress("DEPRECATION")
 
-package net.bloople.audiobooks.media
+package net.bloople.audiobooks
 
 import android.app.PendingIntent
-import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Bitmap
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
-import net.bloople.audiobooks.Book
-import net.bloople.audiobooks.PlayerService
 
 /**
  * Created by Filippo Beraldo on 15/11/2018.
@@ -47,15 +44,13 @@ class DescriptionAdapter(private val context: PlayerService) :
 
     /**
      * Specify the PendingIntent which is fired whenever there's a click on the notification.
-     * This pending intent will fire a broadcast, which will be captured by a BroadcastReceiver
-     * we have to put in the app module.
-     * The broadcast receiver will intercept this intent and start the player activity.
+     * The intent will start the player activity.
      * */
     override fun createCurrentContentIntent(player: Player): PendingIntent? {
-        val explicit = Book.idTo(Intent("net.bloople.audiobooks.LAUNCH_PLAYER_ACTIVITY"), context.bookId)
-        explicit.component = ComponentName(context, "net.bloople.audiobooks.LaunchPlayerBroadcastReceiver")
+        val explicit = Book.idTo(Intent(context, PlayAudiobookActivity::class.java), context.bookId)
+        explicit.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
-        return PendingIntent.getBroadcast(
+        return PendingIntent.getActivity(
             context,
             1,
             explicit,

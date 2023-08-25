@@ -1,4 +1,4 @@
-package net.bloople.audiobooks.player
+package net.bloople.audiobooks
 
 data class PlayerState(
     var window: Int = 0,

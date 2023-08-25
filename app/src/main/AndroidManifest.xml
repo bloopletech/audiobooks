@@ -26,14 +26,6 @@
         </activity>
 
         <service android:name=".PlayerService" android:foregroundServiceType="mediaPlayback" android:exported="true" />
-
-        <receiver
-            android:name=".LaunchPlayerBroadcastReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="net.bloople.audiobooks.LAUNCH_PLAYER_ACTIVITY" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>
