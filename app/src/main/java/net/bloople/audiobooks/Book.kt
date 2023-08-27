@@ -36,6 +36,8 @@ internal class Book {
             return Uri.fromFile(File(path)).toString()
         }
 
+    val isNew get() = this._id == null
+
     fun save(context: Context) {
         val values = ContentValues().apply {
             put("path", path)

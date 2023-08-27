@@ -95,11 +95,14 @@ class IndexingActivity : AppCompatActivity(), Indexable {
         progressBar.max = max
     }
 
-    override fun onIndexingComplete(count: Int) {
+    override fun onIndexingComplete(metrics: IndexingMetrics) {
         setResult(RESULT_OK)
         indexButton.isEnabled = true
         Toast.makeText(
-            this@IndexingActivity, "Indexing complete, $count audiobooks indexed.",
+            this@IndexingActivity,
+            "Indexing complete, processed ${metrics.created} new audiobooks, updated ${metrics.updated} existing " +
+                 "audiobooks, removed ${metrics.deleted} deleted audiobooks, and skipped ${metrics.skipped} " +
+                 "audiobooks.",
             Toast.LENGTH_LONG
         ).show()
     }

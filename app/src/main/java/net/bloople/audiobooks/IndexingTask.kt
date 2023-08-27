@@ -14,7 +14,7 @@ internal class IndexingTask(private val context: Context, private val indexable:
     AsyncTask<String, Int, Unit>() {
     private var progress = 0
     private var max = 0
-    private var indexed = 0
+    private val metrics = IndexingMetrics()
 
     override fun doInBackground(vararg params: String) {
         destroyDeleted()
@@ -27,7 +27,7 @@ internal class IndexingTask(private val context: Context, private val indexable:
     }
 
     override fun onPostExecute(result: Unit?) {
-        indexable.onIndexingComplete(indexed)
+        indexable.onIndexingComplete(metrics)
     }
 
     private fun destroyDeleted() {
@@ -37,7 +37,11 @@ internal class IndexingTask(private val context: Context, private val indexable:
             while (it.moveToNext()) {
                 val book = Book(it)
                 val file = File(book.path!!)
-                if (!file.exists()) book.destroy(context)
+                if (!file.exists()) {
+                    book.destroy(context)
+                    metrics.deleted++
+                }
+
                 progress++
                 publishProgress(progress, max)
             }
@@ -47,26 +51,37 @@ internal class IndexingTask(private val context: Context, private val indexable:
     private fun indexDirectory(directory: File) {
         val files = directory.listFiles() ?: return
         val filesToIndex = ArrayList<File>()
+
+        max += filesToIndex.size
+        publishProgress(progress, max)
+
         for (f in files) {
             if (f.isDirectory) indexDirectory(f)
             else if (AUDIOBOOK_EXTENSIONS.matcher(f.name).find()) filesToIndex.add(f)
         }
-        max += filesToIndex.size
-        publishProgress(progress, max)
+
         for (f in filesToIndex) indexFile(f)
     }
 
     private fun indexFile(file: File) {
-        (Book.findByPathOrNull(context, file.canonicalPath) ?: Book()).edit(context) {
-            val filePath = file.canonicalPath
-            path = filePath
-            title = AUDIOBOOK_EXTENSIONS.matcher(file.name).replaceFirst("")
-            mtime = file.lastModified()
-            size = getDuration(filePath).toLong()
-        }
-        progress++
-        indexed++
+        val book = Book.findByPathOrNull(context, file.canonicalPath) ?: Book()
+        val isNew = book.isNew
 
+        if(file.lastModified() == book.mtime) {
+            metrics.skipped++
+        }
+        else {
+            book.edit(context) {
+                val filePath = file.canonicalPath
+                path = filePath
+                title = AUDIOBOOK_EXTENSIONS.matcher(file.name).replaceFirst("")
+                mtime = file.lastModified()
+                size = getDuration(filePath).toLong()
+            }
+            if(isNew) metrics.created++ else metrics.updated++
+        }
+
+        progress++
         publishProgress(progress, max)
     }
 
