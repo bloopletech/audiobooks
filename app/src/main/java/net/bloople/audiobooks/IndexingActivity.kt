@@ -32,7 +32,10 @@ class IndexingActivity : AppCompatActivity(), Indexable {
         }
         else {
             val uri = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
-            startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri))
+            startActivityForResult(
+                Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri),
+                REQUEST_CODE_MANAGE_EXTERNAL_STORAGE
+            )
         }
 
         progressBar = findViewById(R.id.indexing_progress)
@@ -68,7 +71,8 @@ class IndexingActivity : AppCompatActivity(), Indexable {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_CANCELED) finish()
+
+        if (requestCode == REQUEST_CODE_MANAGE_EXTERNAL_STORAGE) canAccessFiles = Environment.isExternalStorageManager()
     }
 
     private fun preferences(): SharedPreferences {
@@ -98,5 +102,9 @@ class IndexingActivity : AppCompatActivity(), Indexable {
             this@IndexingActivity, "Indexing complete, $count audiobooks indexed.",
             Toast.LENGTH_LONG
         ).show()
+    }
+
+    companion object {
+        private const val REQUEST_CODE_MANAGE_EXTERNAL_STORAGE = 1
     }
 }

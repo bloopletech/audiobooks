@@ -61,7 +61,7 @@ class PlayAudiobookActivity : Activity() {
 
         val permission = checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
         if (permission == PackageManager.PERMISSION_GRANTED) completeCreate()
-        else requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_POST_NOTIFICATIONS)
+        else requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE_POST_NOTIFICATIONS)
     }
 
     private fun completeCreate() {
@@ -73,7 +73,7 @@ class PlayAudiobookActivity : Activity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(requestCode == REQUEST_POST_NOTIFICATIONS && grantResults.isNotEmpty()
+        if(requestCode == REQUEST_CODE_POST_NOTIFICATIONS && grantResults.isNotEmpty()
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) completeCreate()
     }
 
@@ -96,6 +96,6 @@ class PlayAudiobookActivity : Activity() {
     }
 
     companion object {
-        private const val REQUEST_POST_NOTIFICATIONS = 1
+        private const val REQUEST_CODE_POST_NOTIFICATIONS = 1
     }
 }
