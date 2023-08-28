@@ -20,15 +20,15 @@ internal class Book {
 
     constructor()
     constructor(result: Cursor) {
-        _id = result.getLong(result.getColumnIndexOrThrow("_id"))
-        path = result.getString(result.getColumnIndexOrThrow("path"))
-        title = result.getString(result.getColumnIndexOrThrow("title"))
-        mtime = result.getLong(result.getColumnIndexOrThrow("mtime"))
-        size = result.getLong(result.getColumnIndexOrThrow("size"))
-        lastOpenedAt = result.getLong(result.getColumnIndexOrThrow("last_opened_at"))
-        openedCount = result.getInt(result.getColumnIndexOrThrow("opened_count"))
-        lastReadPosition = result.getLong(result.getColumnIndexOrThrow("last_read_position"))
-        starred = result.getInt(result.getColumnIndexOrThrow("starred")) == 1
+        _id = result["_id"]
+        path = result["path"]
+        title = result["title"]
+        mtime = result["mtime"]
+        size = result["size"]
+        lastOpenedAt = result["last_opened_at"]
+        openedCount = result["opened_count"]
+        lastReadPosition = result["last_read_position"]
+        starred = 1 == result["starred"]
     }
 
     val uri: String
@@ -120,4 +120,3 @@ internal class Book {
         }
     }
 }
-
