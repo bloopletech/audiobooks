@@ -36,8 +36,8 @@ open class NewBook(
         }
     }
 
-    open fun save(context: Context): Book {
-        val db = DatabaseHelper.instance(context)
+    open fun save(): Book {
+        val db = DatabaseHelper.instance()
         val id = db.insert("books", null, toValues())
         return Book(id, path, title, mtime, size, lastOpenedAt, openedCount, lastReadPosition, starred)
     }
@@ -66,29 +66,29 @@ class Book(
         result["starred"]
     )
 
-    override fun save(context: Context): Book {
-        val db = DatabaseHelper.instance(context)
+    override fun save(): Book {
+        val db = DatabaseHelper.instance()
         db.update("books", toValues(), "_id=?", arrayOf(_id.toString()))
         return this
     }
 
-    fun edit(context: Context, block: Book.() -> Unit): Book {
-        return apply(block).apply { save(context) }
+    fun edit(block: Book.() -> Unit): Book {
+        return apply(block).apply { save() }
     }
 
-    fun destroy(context: Context) {
-        val db = DatabaseHelper.instance(context)
+    fun destroy() {
+        val db = DatabaseHelper.instance()
         db.delete("books", "_id=?", arrayOf(_id.toString()))
     }
 
     companion object {
-        fun edit(context: Context, id: Long, block: Book.() -> Unit): Book {
-            return find(context, id).edit(context, block)
+        fun edit(id: Long, block: Book.() -> Unit): Book {
+            return find(id).edit(block)
         }
 
         @JvmStatic
-        fun find(context: Context, id: Long): Book {
-            val db = DatabaseHelper.instance(context)
+        fun find(id: Long): Book {
+            val db = DatabaseHelper.instance()
             db.rawQuery("SELECT * FROM books WHERE _id=?", arrayOf(id.toString())).use {
                 it.moveToFirst()
                 return if (it.count > 0) Book(it) else throw NoSuchElementException("Book with id $id not found")
@@ -96,16 +96,16 @@ class Book(
         }
 
         @JvmStatic
-        fun findByPathOrNull(context: Context, path: String): Book? {
-            val db = DatabaseHelper.instance(context)
+        fun findByPathOrNull(path: String): Book? {
+            val db = DatabaseHelper.instance()
             db.rawQuery("SELECT * FROM books WHERE path=?", arrayOf(path)).use {
                 it.moveToFirst()
                 return if (it.count > 0) Book(it) else null
             }
         }
 
-        fun findAll(context: Context, block: (Cursor) -> Unit) {
-            val db = DatabaseHelper.instance(context)
+        fun findAll(block: (Cursor) -> Unit) {
+            val db = DatabaseHelper.instance()
             db.query("books", null, null, null, null, null, null).use(block)
         }
 

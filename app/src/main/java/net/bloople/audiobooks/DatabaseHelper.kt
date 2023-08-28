@@ -11,8 +11,8 @@ internal object DatabaseHelper {
     private const val DB_NAME = "books"
     private lateinit var database: SQLiteDatabase
 
-    private fun obtainDatabase(context: Context): SQLiteDatabase {
-        val db = context.applicationContext.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null)
+    private fun obtainDatabase(): SQLiteDatabase {
+        val db = AudiobooksApplication.context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null)
         loadSchema(db)
         return db
     }
@@ -37,25 +37,25 @@ internal object DatabaseHelper {
 
     @JvmStatic
     @Synchronized
-    fun instance(context: Context): SQLiteDatabase {
+    fun instance(): SQLiteDatabase {
         if (!::database.isInitialized) {
-            database = obtainDatabase(context)
+            database = obtainDatabase()
         }
         return database
     }
 
     @JvmStatic
     @Synchronized
-    fun deleteDatabase(context: Context) {
-        context.applicationContext.deleteDatabase(DB_NAME)
-        database = obtainDatabase(context)
+    fun deleteDatabase() {
+        AudiobooksApplication.context.deleteDatabase(DB_NAME)
+        database = obtainDatabase()
     }
 
     @JvmStatic
     @Synchronized
-    fun exportDatabase(context: Context, outputStream: OutputStream) {
-        val path = instance(context).use { it.path }
-        database = obtainDatabase(context)
+    fun exportDatabase(outputStream: OutputStream) {
+        val path = instance().use { it.path }
+        database = obtainDatabase()
 
         var inputStream: InputStream? = null
         try {
@@ -74,9 +74,9 @@ internal object DatabaseHelper {
 
     @JvmStatic
     @Synchronized
-    fun importDatabase(context: Context, inputStream: InputStream) {
-        val path = instance(context).use { it.path }
-        database = obtainDatabase(context)
+    fun importDatabase(inputStream: InputStream) {
+        val path = instance().use { it.path }
+        database = obtainDatabase()
 
         var outputStream: OutputStream? = null
         try {

@@ -1,6 +1,5 @@
 package net.bloople.audiobooks
 
-import android.content.Context
 import android.database.Cursor
 import net.bloople.audiobooks.DatabaseHelper.instance
 import java.lang.IllegalStateException
@@ -53,8 +52,8 @@ class BooksSearcher {
         return orderBy
     }
 
-    fun search(context: Context): Cursor {
-        val db = instance(context)
+    fun search(): Cursor {
+        val db = instance()
         val cursor: Cursor = if (searchText != "") {
             db.query("books", null, "title LIKE ?", arrayOf("%$searchText%"), null, null, orderBy())
         }

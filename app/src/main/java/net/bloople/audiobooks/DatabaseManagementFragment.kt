@@ -44,7 +44,7 @@ class DatabaseManagementFragment : Fragment() {
     private fun completeExport(data: Intent) {
         try {
             requireContext().contentResolver.openOutputStream(data.data!!).use {
-                DatabaseHelper.exportDatabase(requireContext(), it!!)
+                DatabaseHelper.exportDatabase(it!!)
             }
 
             Toast.makeText(context, "Database exported successfully", Toast.LENGTH_LONG).show()
@@ -64,7 +64,7 @@ class DatabaseManagementFragment : Fragment() {
     private fun completeImport(data: Intent) {
         try {
             requireContext().contentResolver.openInputStream(data.data!!).use {
-                DatabaseHelper.importDatabase(requireContext(), it!!)
+                DatabaseHelper.importDatabase(it!!)
             }
 
             Toast.makeText(context, "Database imported successfully", Toast.LENGTH_LONG).show()

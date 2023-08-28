@@ -2,13 +2,12 @@
 
 package net.bloople.audiobooks
 
-import android.content.Context
 import android.os.AsyncTask
 import java.io.File
 import java.util.*
 
 @Suppress("OVERRIDE_DEPRECATION")
-internal class IndexingTask(private val context: Context, private val indexable: Indexable) :
+internal class IndexingTask(private val indexable: Indexable) :
     AsyncTask<String, Int, Unit>() {
     private var progress = 0
     private var max = 0
@@ -30,12 +29,12 @@ internal class IndexingTask(private val context: Context, private val indexable:
     }
 
     private fun destroyDeleted() {
-        Book.findAll(context) {
+        Book.findAll {
             max += it.count
             while (it.moveToNext()) {
                 val book = Book(it)
                 if (!book.file.exists()) {
-                    book.destroy(context)
+                    book.destroy()
                     metrics.deleted++
                 }
 
@@ -57,7 +56,7 @@ internal class IndexingTask(private val context: Context, private val indexable:
 
     private fun indexFile(file: File) {
         val parsedFile by lazy { fileParser.parse(file) }
-        val book = Book.findByPathOrNull(context, file.canonicalPath)
+        val book = Book.findByPathOrNull(file.canonicalPath)
         if(book != null) updateBook(parsedFile, book)
         else createBook(parsedFile)
 
@@ -66,7 +65,7 @@ internal class IndexingTask(private val context: Context, private val indexable:
     }
 
     private fun createBook(parsedFile: ParsedFile) {
-        NewBook(parsedFile.path, parsedFile.title, parsedFile.mtime, parsedFile.size).save(context)
+        NewBook(parsedFile.path, parsedFile.title, parsedFile.mtime, parsedFile.size).save()
         metrics.created++
     }
 
@@ -76,7 +75,7 @@ internal class IndexingTask(private val context: Context, private val indexable:
             return
         }
 
-        book.edit(context) {
+        book.edit {
             title = parsedFile.title
             mtime = parsedFile.mtime
             size = parsedFile.size

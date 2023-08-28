@@ -48,8 +48,8 @@ class PlayAudiobookActivity : Activity() {
 
         bookId = Book.idFrom(intent)
 
-        val book = Book.find(this, bookId)
-        book.edit(this) {
+        val book = Book.find(bookId)
+        book.edit {
             lastOpenedAt = System.currentTimeMillis()
             openedCount += 1
         }
@@ -78,7 +78,7 @@ class PlayAudiobookActivity : Activity() {
 
     override fun onStop() {
         super.onStop()
-        Book.edit(this, bookId) { lastOpenedAt = System.currentTimeMillis() }
+        Book.edit(bookId) { lastOpenedAt = System.currentTimeMillis() }
     }
 
     override fun onBackPressed() {

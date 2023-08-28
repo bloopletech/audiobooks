@@ -142,7 +142,7 @@ class PlayerService : IntentService("audiobooks") {
 
     // Prepare playback.
     private fun start() {
-        val book = Book.find(this, bookId)
+        val book = Book.find(bookId)
         playerState = PlayerState(position = book.lastReadPosition)
         with(player) {
             // Restore state (after onResume()/onStart())
@@ -190,6 +190,6 @@ class PlayerService : IntentService("audiobooks") {
         if (bookId == -1L) return
         val currentPosition = player.currentPosition
         val position = if (currentPosition == C.TIME_UNSET || currentPosition >= player.duration) 0 else currentPosition
-        Book.edit(this, bookId) { lastReadPosition = position }
+        Book.edit(bookId) { lastReadPosition = position }
     }
 }

@@ -37,13 +37,11 @@ class BooksAdapter(cursor: Cursor?) : CursorRecyclerAdapter<BooksAdapter.ViewHol
             starView = view.findViewById(R.id.story_star)
 
             starView.setOnClickListener { v: View ->
-                val context = v.context
-
-                val book = Book.find(context, itemId)
+                val book = Book.find(itemId)
                 val starred = !book.starred
 
                 book.starred = starred
-                book.save(context)
+                book.save()
 
                 v.isActivated = starred
             }

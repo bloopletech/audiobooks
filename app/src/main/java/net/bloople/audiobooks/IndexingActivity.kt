@@ -44,14 +44,14 @@ class IndexingActivity : AppCompatActivity(), Indexable {
             indexButton.isEnabled = false
 
             if (canAccessFiles) {
-                val indexer = IndexingTask(this@IndexingActivity,this@IndexingActivity)
+                val indexer = IndexingTask(this@IndexingActivity)
                 indexer.execute(indexRoot)
             }
         }
 
         val deleteIndexButton = findViewById<Button>(R.id.delete_index_button)
         deleteIndexButton.setOnClickListener {
-            deleteDatabase(this@IndexingActivity)
+            deleteDatabase()
             Toast.makeText(this@IndexingActivity, "Index deleted.", Toast.LENGTH_SHORT).show()
             setResult(RESULT_OK)
         }

@@ -40,6 +40,6 @@ class IndexViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun resolve() {
         val service = Executors.newSingleThreadExecutor()
-        service.submit { searchResults.postValue(searcher.search(getApplication())) }
+        service.submit { searchResults.postValue(searcher.search()) }
     }
 }
