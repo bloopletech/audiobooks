@@ -55,42 +55,15 @@ internal object DatabaseHelper {
     @Synchronized
     fun exportDatabase(outputStream: OutputStream) {
         val path = instance().use { it.path }
-        database = obtainDatabase()
-
-        var inputStream: InputStream? = null
-        try {
-            inputStream = FileInputStream(path)
-            val buffer = ByteArray(1024)
-            var length: Int
-            while(inputStream.read(buffer).also { length = it } > 0) {
-                outputStream.write(buffer, 0, length)
-            }
-        }
-        finally {
-            inputStream?.close()
-            outputStream.close()
-        }
+        outputStream.use { FileInputStream(path).use { inputStream -> inputStream.copyTo(it) } }
     }
 
     @JvmStatic
     @Synchronized
     fun importDatabase(inputStream: InputStream) {
         val path = instance().use { it.path }
+        inputStream.use { FileOutputStream(path).use { outputStream -> inputStream.copyTo(outputStream) } }
         database = obtainDatabase()
-
-        var outputStream: OutputStream? = null
-        try {
-            outputStream = FileOutputStream(path)
-            val buffer = ByteArray(1024)
-            var length: Int
-            while(inputStream.read(buffer).also { length = it } > 0) {
-                outputStream.write(buffer, 0, length)
-            }
-        }
-        finally {
-            inputStream.close()
-            outputStream?.close()
-        }
     }
 
     private fun hasColumn(db: SQLiteDatabase, tableName: String, columnName: String): Boolean {
