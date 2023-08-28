@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import java.util.concurrent.Executors
 
-class IndexViewModel(private val application: Application) : AndroidViewModel(application) {
+class IndexViewModel(application: Application) : AndroidViewModel(application) {
     private val searcher = BooksSearcher()
 
     val searchResults: MutableLiveData<Cursor> by lazy {

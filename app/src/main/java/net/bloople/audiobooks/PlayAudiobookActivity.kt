@@ -65,8 +65,7 @@ class PlayAudiobookActivity : Activity() {
     }
 
     private fun completeCreate() {
-        val book = Book.find(this, bookId)
-        val playerIntent = book.idTo(Intent(this.applicationContext, PlayerService::class.java))
+        val playerIntent = Book.idTo(Intent(this.applicationContext, PlayerService::class.java), bookId)
         startService(playerIntent)
         bindService(playerIntent, connection, BIND_AUTO_CREATE)
     }
@@ -74,7 +73,7 @@ class PlayAudiobookActivity : Activity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if(requestCode == REQUEST_CODE_POST_NOTIFICATIONS && grantResults.isNotEmpty()
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) completeCreate()
+            && grantResults[0] == PackageManager.PERMISSION_GRANTED) completeCreate()
     }
 
     override fun onStop() {

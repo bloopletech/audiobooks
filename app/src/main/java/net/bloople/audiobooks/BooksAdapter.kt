@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import net.bloople.audiobooks.Book.Companion.find
-import net.bloople.audiobooks.Book.Companion.idTo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Formatter
@@ -27,7 +25,7 @@ class BooksAdapter(cursor: Cursor?) : CursorRecyclerAdapter<BooksAdapter.ViewHol
         init {
             view.setOnClickListener { v: View ->
                 val context = v.context
-                val intent = idTo(Intent(context, PlayAudiobookActivity::class.java), itemId)
+                val intent = Book.idTo(Intent(context, PlayAudiobookActivity::class.java), itemId)
                 context.startActivity(intent)
             }
 
@@ -41,7 +39,7 @@ class BooksAdapter(cursor: Cursor?) : CursorRecyclerAdapter<BooksAdapter.ViewHol
             starView.setOnClickListener { v: View ->
                 val context = v.context
 
-                val book = find(context, itemId)
+                val book = Book.find(context, itemId)
                 val starred = !book.starred
 
                 book.starred = starred

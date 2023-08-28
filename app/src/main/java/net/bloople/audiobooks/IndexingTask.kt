@@ -3,11 +3,9 @@
 package net.bloople.audiobooks
 
 import android.content.Context
-import android.media.MediaMetadataRetriever
 import android.os.AsyncTask
 import java.io.File
 import java.util.*
-import java.util.regex.Pattern
 
 @Suppress("OVERRIDE_DEPRECATION")
 internal class IndexingTask(private val context: Context, private val indexable: Indexable) :
@@ -15,10 +13,11 @@ internal class IndexingTask(private val context: Context, private val indexable:
     private var progress = 0
     private var max = 0
     private val metrics = IndexingMetrics()
+    private val fileParser = FileParser()
 
     override fun doInBackground(vararg params: String) {
         destroyDeleted()
-        indexDirectory(File(params[0]))
+        fileParser.use { indexDirectory(File(params[0])) }
         publishProgress(progress, max)
     }
 
@@ -31,13 +30,11 @@ internal class IndexingTask(private val context: Context, private val indexable:
     }
 
     private fun destroyDeleted() {
-        val db = DatabaseHelper.instance(context)
-        db.query("books", null, null, null, null, null, null).use {
+        Book.findAll(context) {
             max += it.count
             while (it.moveToNext()) {
                 val book = Book(it)
-                val file = File(book.path!!)
-                if (!file.exists()) {
+                if (!book.file.exists()) {
                     book.destroy(context)
                     metrics.deleted++
                 }
@@ -49,55 +46,45 @@ internal class IndexingTask(private val context: Context, private val indexable:
     }
 
     private fun indexDirectory(directory: File) {
-        val files = directory.listFiles() ?: return
-        val filesToIndex = ArrayList<File>()
+        val (directories, files) = directory.listFiles()?.partition { it.isDirectory } ?: return
+        for(d in directories) { indexDirectory(d) }
 
-        max += filesToIndex.size
-        publishProgress(progress, max)
-
-        for (f in files) {
-            if (f.isDirectory) indexDirectory(f)
-            else if (AUDIOBOOK_EXTENSIONS.matcher(f.name).find()) filesToIndex.add(f)
-        }
-
-        for (f in filesToIndex) indexFile(f)
+        files.filter { AUDIOBOOK_EXTENSIONS.contains(it.extension.lowercase()) }.also {
+            max += it.size
+            publishProgress(progress, max)
+        }.forEach(::indexFile)
     }
 
     private fun indexFile(file: File) {
-        val book = Book.findByPathOrNull(context, file.canonicalPath) ?: Book()
-        val isNew = book.isNew
-
-        if(file.lastModified() == book.mtime) {
-            metrics.skipped++
-        }
-        else {
-            book.edit(context) {
-                val filePath = file.canonicalPath
-                path = filePath
-                title = AUDIOBOOK_EXTENSIONS.matcher(file.name).replaceFirst("")
-                mtime = file.lastModified()
-                size = getDuration(filePath).toLong()
-            }
-            if(isNew) metrics.created++ else metrics.updated++
-        }
+        val parsedFile by lazy { fileParser.parse(file) }
+        val book = Book.findByPathOrNull(context, file.canonicalPath)
+        if(book != null) updateBook(parsedFile, book)
+        else createBook(parsedFile)
 
         progress++
         publishProgress(progress, max)
     }
 
-    private fun getDuration(path: String): Int {
-        return try {
-            val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(path)
-            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            duration?.toInt() ?: 0
-        } catch (e: RuntimeException) {
-            e.printStackTrace()
-            0
+    private fun createBook(parsedFile: ParsedFile) {
+        NewBook(parsedFile.path, parsedFile.title, parsedFile.mtime, parsedFile.size).save(context)
+        metrics.created++
+    }
+
+    private fun updateBook(parsedFile: ParsedFile, book: Book) {
+        if(parsedFile.mtime == book.mtime) {
+            metrics.skipped++
+            return
         }
+
+        book.edit(context) {
+            title = parsedFile.title
+            mtime = parsedFile.mtime
+            size = parsedFile.size
+        }
+        metrics.updated++
     }
 
     companion object {
-        val AUDIOBOOK_EXTENSIONS: Pattern = Pattern.compile("(?i)\\.(m4a|mkv|mp3|mp4|wav|webm)$")
+        val AUDIOBOOK_EXTENSIONS = listOf("m4a", "mkv", "mp3", "mp4", "wav", "webm")
     }
 }
